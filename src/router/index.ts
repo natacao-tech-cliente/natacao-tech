@@ -11,6 +11,8 @@ const AttendanceView = () =>
 const DashboardView = () =>
   import("@/modules/dashboard/views/DashboardView.vue");
 
+const StudentsView = () => import("@/modules/students/views/StudentsView.vue");
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -39,6 +41,11 @@ const router = createRouter({
           path: "attendance",
           name: "attendance",
           component: AttendanceView,
+        },
+        {
+          path: "students",
+          name: "students",
+          component: StudentsView, // <--- Substitua o ComingSoon aqui
         },
       ],
     },
