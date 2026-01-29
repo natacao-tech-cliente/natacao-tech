@@ -1,59 +1,49 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { supabase } from "@/core/services/supabase"; // Importe o supabase
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { supabase } from '@/core/services/supabase'
 
-// Controle do Menu Mobile
-const isMobileOpen = ref(false);
-const router = useRouter();
-const route = useRoute();
+const isMobileOpen = ref(false)
+const router = useRouter()
+const route = useRoute()
 
 const menuItems = [
-  { label: "Dashboard", icon: "pi pi-home", route: "/" },
-  // { label: "Chamada", icon: "pi pi-calendar-plus", route: "/attendance" }, //
-  { label: "Avaliações", icon: "pi pi-check-circle", route: "/assessments" },
-  { label: "Turmas", icon: "pi pi-calendar", route: "/classes" },
-  { label: "Alunos", icon: "pi pi-users", route: "/students" },
-  { label: "Relatórios", icon: "pi pi-chart-bar", route: "/reports" },
-];
+  { label: 'Dashboard', icon: 'pi pi-home', route: '/' },
+  { label: 'Avaliações', icon: 'pi pi-check-circle', route: '/assessments' },
+  { label: 'Turmas', icon: 'pi pi-calendar', route: '/classes' },
+  { label: 'Alunos', icon: 'pi pi-users', route: '/students' },
+  { label: 'Relatórios', icon: 'pi pi-chart-bar', route: '/reports' },
+]
 
 function navigate(path: string) {
-  router.push(path);
-  isMobileOpen.value = false;
+  router.push(path)
+  isMobileOpen.value = false
 }
 
-// --- FUNÇÃO DE LOGOUT ---
 async function handleLogout() {
-  // 1. Tenta deslogar no Supabase (mesmo que falhe por falta de net/backend)
-  await supabase.auth.signOut();
-
-  // 2. Limpa qualquer estado local (se estivesse usando Pinia, limparia aqui)
-
-  // 3. Força o redirecionamento para o login
-  router.push("/login");
+  await supabase.auth.signOut()
+  router.push('/login')
 }
 </script>
 
 <template>
   <button
-    class="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-full shadow-lg text-brand-600 hover:bg-gray-50 transition-all"
+    class="lg:hidden fixed top-3 left-3 z-[60] p-3 bg-white text-gray-700 rounded-md shadow-lg border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all active:scale-95"
     @click="isMobileOpen = !isMobileOpen"
+    aria-label="Menu"
   >
-    <i
-      :class="isMobileOpen ? 'pi pi-times' : 'pi pi-bars'"
-      style="font-size: 1.2rem"
-    ></i>
+    <i class="pi pi-bars text-xl"></i>
   </button>
 
   <div
     v-if="isMobileOpen"
-    class="fixed inset-0 bg-black/50 z-30 lg:hidden backdrop-blur-sm"
+    class="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
     @click="isMobileOpen = false"
   ></div>
 
   <aside
     :class="[
-      'fixed top-0 left-0 h-screen bg-white border-r border-gray-100 z-40 transition-transform duration-300 w-64 flex flex-col',
+      'fixed top-0 left-0 h-screen bg-white border-r border-gray-100 z-50 transition-transform duration-300 w-64 flex flex-col',
       isMobileOpen
         ? 'translate-x-0 shadow-2xl'
         : '-translate-x-full lg:translate-x-0',

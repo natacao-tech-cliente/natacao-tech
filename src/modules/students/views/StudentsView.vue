@@ -1,103 +1,131 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useToast } from "primevue/usetoast";
+import { ref, computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
 
 // UI Components
-import Select from "primevue/select";
-import Button from "primevue/button";
-import IconField from "primevue/iconfield";
-import InputIcon from "primevue/inputicon";
-import InputText from "primevue/inputtext";
-import Tag from "primevue/tag";
-import Dialog from "primevue/dialog";
+import Select from 'primevue/select'
+import Button from 'primevue/button'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import InputText from 'primevue/inputtext'
+import Tag from 'primevue/tag'
+import Dialog from 'primevue/dialog'
 
-const toast = useToast();
+const toast = useToast()
 
 // --- MOCKS ---
 const CLASSES = [
-  { name: "Todas as Turmas", code: "all" },
-  { name: "Segunda/Quarta - 09:00", code: "T1" },
-  { name: "Terça/Quinta - 15:00", code: "T2" },
-  { name: "Sábado - 10:00", code: "T3" },
-];
+  { name: 'Todas as Turmas', code: 'all' },
+  { name: 'Segunda/Quarta - 09:00', code: 'T1' },
+  { name: 'Terça/Quinta - 15:00', code: 'T2' },
+  { name: 'Sábado - 10:00', code: 'T3' },
+]
 
 const LEVELS = [
-  { name: "Acqua Baby", code: "baby" },
-  { name: "Touca Laranja", code: "laranja" },
-  { name: "Touca Vermelha", code: "vermelha" },
-  { name: "Touca Preta", code: "expert" },
-];
+  { name: 'Acqua Baby', code: 'baby' },
+  { name: 'Touca Laranja', code: 'laranja' },
+  { name: 'Touca Vermelha', code: 'vermelha' },
+  { name: 'Touca Preta', code: 'expert' },
+]
 
 const STUDENTS_DATA = [
-  { id: "1", name: "Davi Rocha", class_code: "T1", level: "laranja", active: true },
-  { id: "2", name: "Maria Silva", class_code: "T2", level: "vermelha", active: true },
-  { id: "3", name: "João Pedro", class_code: "T1", level: "laranja", active: false },
-  { id: "4", name: "Ana Clara", class_code: "T3", level: "baby", active: true },
-  { id: "5", name: "Lucas Souza", class_code: "T2", level: "expert", active: true },
-  { id: "6", name: "Beatriz Lima", class_code: "T1", level: "laranja", active: true },
-];
+  {
+    id: '1',
+    name: 'Davi Rocha',
+    class_code: 'T1',
+    level: 'laranja',
+    active: true,
+  },
+  {
+    id: '2',
+    name: 'Maria Silva',
+    class_code: 'T2',
+    level: 'vermelha',
+    active: true,
+  },
+  {
+    id: '3',
+    name: 'João Pedro',
+    class_code: 'T1',
+    level: 'laranja',
+    active: false,
+  },
+  { id: '4', name: 'Ana Clara', class_code: 'T3', level: 'baby', active: true },
+  {
+    id: '5',
+    name: 'Lucas Souza',
+    class_code: 'T2',
+    level: 'expert',
+    active: true,
+  },
+  {
+    id: '6',
+    name: 'Beatriz Lima',
+    class_code: 'T1',
+    level: 'laranja',
+    active: true,
+  },
+]
 
 // --- ESTADO ---
-const selectedClass = ref(CLASSES[0]);
-const searchQuery = ref("");
-const students = ref(STUDENTS_DATA);
+const selectedClass = ref(CLASSES[0])
+const searchQuery = ref('')
+const students = ref(STUDENTS_DATA)
 
 // Estado do Modal
-const showMoveModal = ref(false);
-const studentToMove = ref<any>(null);
-const targetClass = ref<any>(null);
-const targetLevel = ref<any>(null);
+const showMoveModal = ref(false)
+const studentToMove = ref<any>(null)
+const targetClass = ref<any>(null)
+const targetLevel = ref<any>(null)
 
 // --- FILTROS ---
 const filteredStudents = computed(() => {
   return students.value.filter((student) => {
     const matchesSearch = student.name
       .toLowerCase()
-      .includes(searchQuery.value.toLowerCase());
-    
-    // CORREÇÃO 1: Uso de ?. para evitar erro se selectedClass for undefined
-    const matchesClass =
-      selectedClass.value?.code === "all" ||
-      student.class_code === selectedClass.value?.code;
+      .includes(searchQuery.value.toLowerCase())
 
-    return matchesSearch && matchesClass;
-  });
-});
+    const matchesClass =
+      selectedClass.value?.code === 'all' ||
+      student.class_code === selectedClass.value?.code
+
+    return matchesSearch && matchesClass
+  })
+})
 
 // --- AÇÕES ---
 function getLevelName(code: string) {
-  return LEVELS.find((l) => l.code === code)?.name || code;
+  return LEVELS.find((l) => l.code === code)?.name || code
 }
 
 function openMoveModal(student: any) {
-  studentToMove.value = student;
-  targetClass.value = null;
-  targetLevel.value = null;
-  showMoveModal.value = true;
+  studentToMove.value = student
+  targetClass.value = null
+  targetLevel.value = null
+  showMoveModal.value = true
 }
 
 function saveMove() {
-  if (!targetClass.value) return;
+  if (!targetClass.value || !studentToMove.value) return
 
-  const index = students.value.findIndex(
-    (s) => s.id === studentToMove.value.id,
-  );
-  if (index !== -1) {
-    // CORREÇÃO 2: Uso de ?. para garantir acesso seguro
-    students.value[index].class_code = targetClass.value?.code;
+  const index = students.value.findIndex((s) => s.id === studentToMove.value.id)
+
+  if (index !== -1 && students.value[index]) {
+    students.value[index].class_code = targetClass.value.code
+
     if (targetLevel.value) {
-      students.value[index].level = targetLevel.value?.code;
+      students.value[index].level = targetLevel.value.code
     }
+
+    toast.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: `${studentToMove.value.name} transferido para ${targetClass.value.name}`,
+      life: 3000,
+    })
+
+    showMoveModal.value = false
   }
-
-  toast.add({
-    severity: "success",
-    summary: "Sucesso",
-    detail: `${studentToMove.value.name} transferido para ${targetClass.value?.name}`,
-    life: 3000,
-  });
-
-  showMoveModal.value = false;
 }
 </script>
 
@@ -176,12 +204,13 @@ function saveMove() {
           </div>
 
           <Button
-            icon="pi pi-pencil"
+            icon="pi pi-arrow-right-arrow-left"
             outlined
-            rounded
-            severity="secondary"
+            severity="help"
+            v-tooltip.top="'Mover Aluno'"
             @click="openMoveModal(student)"
-            aria-label="Editar"
+            aria-label="Mover Aluno"
+            class="!w-10 !h-10 border-gray-200 text-purple-600 hover:bg-purple-50"
           />
         </div>
 
@@ -198,11 +227,6 @@ function saveMove() {
           </div>
         </div>
       </div>
-    </div>
-
-    <div v-if="filteredStudents.length === 0" class="text-center py-12">
-      <i class="pi pi-users text-4xl text-gray-300 mb-3"></i>
-      <p class="text-gray-500">Nenhum aluno encontrado.</p>
     </div>
 
     <Dialog
