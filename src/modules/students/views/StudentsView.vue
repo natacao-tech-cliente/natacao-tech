@@ -13,7 +13,7 @@ import Dialog from "primevue/dialog";
 
 const toast = useToast();
 
-// --- MOCKS (Simulando o banco de dados) ---
+// --- MOCKS ---
 const CLASSES = [
   { name: "Todas as Turmas", code: "all" },
   { name: "Segunda/Quarta - 09:00", code: "T1" },
@@ -29,54 +29,12 @@ const LEVELS = [
 ];
 
 const STUDENTS_DATA = [
-  {
-    id: "1",
-    name: "Davi Rocha",
-    class_code: "T1",
-    level: "laranja",
-    active: true,
-    photo: null,
-  },
-  {
-    id: "2",
-    name: "Maria Silva",
-    class_code: "T2",
-    level: "vermelha",
-    active: true,
-    photo: null,
-  },
-  {
-    id: "3",
-    name: "João Pedro",
-    class_code: "T1",
-    level: "laranja",
-    active: false,
-    photo: null,
-  },
-  {
-    id: "4",
-    name: "Ana Clara",
-    class_code: "T3",
-    level: "baby",
-    active: true,
-    photo: null,
-  },
-  {
-    id: "5",
-    name: "Lucas Souza",
-    class_code: "T2",
-    level: "expert",
-    active: true,
-    photo: null,
-  },
-  {
-    id: "6",
-    name: "Beatriz Lima",
-    class_code: "T1",
-    level: "laranja",
-    active: true,
-    photo: null,
-  },
+  { id: "1", name: "Davi Rocha", class_code: "T1", level: "laranja", active: true },
+  { id: "2", name: "Maria Silva", class_code: "T2", level: "vermelha", active: true },
+  { id: "3", name: "João Pedro", class_code: "T1", level: "laranja", active: false },
+  { id: "4", name: "Ana Clara", class_code: "T3", level: "baby", active: true },
+  { id: "5", name: "Lucas Souza", class_code: "T2", level: "expert", active: true },
+  { id: "6", name: "Beatriz Lima", class_code: "T1", level: "laranja", active: true },
 ];
 
 // --- ESTADO ---
@@ -84,23 +42,23 @@ const selectedClass = ref(CLASSES[0]);
 const searchQuery = ref("");
 const students = ref(STUDENTS_DATA);
 
-// Estado do Modal de Movimentação
+// Estado do Modal
 const showMoveModal = ref(false);
 const studentToMove = ref<any>(null);
-const targetClass = ref();
-const targetLevel = ref();
+const targetClass = ref<any>(null);
+const targetLevel = ref<any>(null);
 
 // --- FILTROS ---
 const filteredStudents = computed(() => {
   return students.value.filter((student) => {
-    // Filtro por Texto
     const matchesSearch = student.name
       .toLowerCase()
       .includes(searchQuery.value.toLowerCase());
-    // Filtro por Turma
+    
+    // CORREÇÃO 1: Uso de ?. para evitar erro se selectedClass for undefined
     const matchesClass =
-      selectedClass.value.code === "all" ||
-      student.class_code === selectedClass.value.code;
+      selectedClass.value?.code === "all" ||
+      student.class_code === selectedClass.value?.code;
 
     return matchesSearch && matchesClass;
   });
@@ -121,21 +79,21 @@ function openMoveModal(student: any) {
 function saveMove() {
   if (!targetClass.value) return;
 
-  // Simula a atualização no "Banco"
   const index = students.value.findIndex(
     (s) => s.id === studentToMove.value.id,
   );
   if (index !== -1) {
-    students.value[index].class_code = targetClass.value.code;
+    // CORREÇÃO 2: Uso de ?. para garantir acesso seguro
+    students.value[index].class_code = targetClass.value?.code;
     if (targetLevel.value) {
-      students.value[index].level = targetLevel.value.code;
+      students.value[index].level = targetLevel.value?.code;
     }
   }
 
   toast.add({
     severity: "success",
-    summary: "Aluno Transferido",
-    detail: `${studentToMove.value.name} foi movido para ${targetClass.value.name}`,
+    summary: "Sucesso",
+    detail: `${studentToMove.value.name} transferido para ${targetClass.value?.name}`,
     life: 3000,
   });
 
@@ -218,12 +176,12 @@ function saveMove() {
           </div>
 
           <Button
-            icon="pi pi-sync"
-            text
+            icon="pi pi-pencil"
+            outlined
             rounded
             severity="secondary"
-            v-tooltip.top="'Trocar de Turma/Nível'"
             @click="openMoveModal(student)"
+            aria-label="Editar"
           />
         </div>
 
@@ -257,7 +215,7 @@ function saveMove() {
         <div class="bg-blue-50 p-4 rounded-lg flex items-center gap-3">
           <i class="pi pi-info-circle text-blue-500 text-xl"></i>
           <p class="text-sm text-blue-700">
-            Você está movendo <b>{{ studentToMove.name }}</b> da turma
+            Movendo <b>{{ studentToMove.name }}</b> da turma
             {{ studentToMove.class_code }}.
           </p>
         </div>
@@ -292,7 +250,7 @@ function saveMove() {
             @click="showMoveModal = false"
           />
           <Button
-            label="Confirmar Transferência"
+            label="Confirmar"
             icon="pi pi-check"
             @click="saveMove"
             :disabled="!targetClass"
