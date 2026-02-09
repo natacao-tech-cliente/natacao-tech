@@ -10,7 +10,7 @@ const route = useRoute()
 const menuItems = [
   { label: 'Dashboard', icon: 'pi pi-home', route: '/' },
   { label: 'Avaliações', icon: 'pi pi-check-circle', route: '/assessments' },
-  { label: 'Turmas', icon: 'pi pi-calendar', route: '/classes' },
+  // { label: "Turmas", icon: "pi pi-calendar", route: "/classes" }, // <--- OCULTO PARA A REUNIÃO
   { label: 'Alunos', icon: 'pi pi-users', route: '/students' },
   { label: 'Relatórios', icon: 'pi pi-chart-bar', route: '/reports' },
 ]
@@ -49,15 +49,15 @@ async function handleLogout() {
         : '-translate-x-full lg:translate-x-0',
     ]"
   >
-    <div class="h-20 flex items-center justify-center border-b border-gray-50">
-      <div class="flex items-center gap-2">
-        <i class="pi pi-waves text-brand-500 text-2xl"></i>
-        <h1 class="text-2xl font-bold text-gray-800 tracking-tight">
-          Acqua<span class="text-brand-500">Kids</span>
-        </h1>
-      </div>
+    <div
+      class="h-36 flex items-center justify-center border-b border-gray-50 p-4"
+    >
+      <img
+        src="/images/acquOnwhite.jpeg"
+        alt="AcquOn Logo"
+        class="max-h-full w-auto object-contain"
+      />
     </div>
-
     <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
       <a
         v-for="item in menuItems"
