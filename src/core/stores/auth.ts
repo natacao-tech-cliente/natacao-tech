@@ -71,13 +71,12 @@ export const useAuthStore = defineStore('auth', () => {
     router.push('/login')
   }
 
-  // IMPORTANTE: Exportar o signIn aqui embaixo
   return {
     user,
     session,
     loading,
     initialize,
-    signIn, // <--- O ERRO ACONTECIA PORQUE ISSO NÃO EXISTIA
+    signIn,
     signOut,
   }
 })
