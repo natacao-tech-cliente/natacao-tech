@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/core/stores/auth' // <--- Importamos a Store
+import { useAuthStore } from '@/core/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
 
-// Lazy Loading das Views
 const LoginView = () => import('@/modules/auth/views/LoginView.vue')
 const AssessmentsView = () =>
   import('@/modules/assessments/views/AssessmentsView.vue')
@@ -38,6 +37,21 @@ const router = createRouter({
         { path: 'students', name: 'students', component: StudentsView },
         { path: 'reports', name: 'reports', component: ReportsView },
         { path: 'classes', name: 'classes', component: ClassesView },
+
+        // Rotas Admin — dentro do AppLayout para herdar sidebar/navbar
+        {
+          path: 'admin/usuarios',
+          name: 'admin-usuarios',
+          component: () =>
+            import('@/modules/admin/views/AdminUsuariosView.vue'),
+          meta: { requiresAdmin: true },
+        },
+        {
+          path: 'admin/habilidades',
+          name: 'admin-habilidades',
+          component: () => import('@/modules/admin/views/HabilidadesView.vue'),
+          meta: { requiresAdmin: true },
+        },
       ],
     },
   ],
@@ -45,21 +59,28 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
 
   if (!authStore.token) {
     authStore.checkAuth()
   }
 
   const isAuthenticated = !!authStore.token
+  const requiresAuth = to.matched.some((r) => r.meta.requiresAuth)
+  const requiresAdmin = to.matched.some((r) => r.meta.requiresAdmin)
 
   if (requiresAuth && !isAuthenticated) {
-    next('/login')
-  } else if (to.path === '/login' && isAuthenticated) {
-    next('/')
-  } else {
-    next()
+    return next('/login')
   }
+
+  if (to.path === '/login' && isAuthenticated) {
+    return next('/')
+  }
+
+  if (requiresAdmin && authStore.userRole !== 'ADMIN') {
+    return next('/')
+  }
+
+  next()
 })
 
 export default router
