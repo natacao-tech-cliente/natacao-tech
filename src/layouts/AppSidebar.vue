@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/core/stores/auth'
 
@@ -23,6 +24,16 @@ const adminItems = [
     route: '/admin/habilidades',
   },
 ]
+
+const iniciais = computed(() => {
+  const [prefix] = (authStore.user || '').split('@')
+  return (prefix ?? '').slice(0, 2).toUpperCase()
+})
+
+const nomeExibicao = computed(() => {
+  const [prefix] = (authStore.user || '').split('@')
+  return prefix ?? authStore.user ?? ''
+})
 
 function navigate(path: string) {
   router.push(path)
@@ -132,7 +143,32 @@ function logout() {
       </template>
     </div>
 
-    <div class="p-4 border-t border-slate-50 shrink-0">
+    <div class="p-4 border-t border-slate-50 shrink-0 space-y-1">
+      <!-- Perfil -->
+      <a
+        @click="navigate('/perfil')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group"
+        :class="{
+          'bg-slate-100 text-slate-800': route.path === '/perfil',
+          'text-slate-500 hover:bg-slate-50 hover:text-slate-800':
+            route.path !== '/perfil',
+        }"
+      >
+        <div
+          class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0"
+        >
+          {{ iniciais }}
+        </div>
+        <div class="flex flex-col items-start overflow-hidden">
+          <span class="font-bold text-sm truncate w-full">{{
+            nomeExibicao
+          }}</span>
+          <span class="text-xs opacity-60 truncate w-full">Meu Perfil</span>
+        </div>
+        <i class="pi pi-angle-right text-xs ml-auto opacity-40"></i>
+      </a>
+
+      <!-- Sair -->
       <button
         @click="logout"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 hover:shadow-sm transition-all duration-200 group"

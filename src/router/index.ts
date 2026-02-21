@@ -37,6 +37,11 @@ const router = createRouter({
         { path: 'students', name: 'students', component: StudentsView },
         { path: 'reports', name: 'reports', component: ReportsView },
         { path: 'classes', name: 'classes', component: ClassesView },
+        {
+          path: 'perfil',
+          name: 'perfil',
+          component: () => import('@/modules/profile/views/ProfileView.vue'),
+        },
 
         // Rotas Admin — dentro do AppLayout para herdar sidebar/navbar
         {
