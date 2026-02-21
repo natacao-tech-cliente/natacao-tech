@@ -242,49 +242,61 @@ async function saveClass() {
       <div
         v-for="turma in filteredClasses"
         :key="turma.uuid"
-        class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group relative"
+        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
       >
-        <Button
-          icon="pi pi-trash"
-          text
-          severity="danger"
-          class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-          @click="confirmDelete(turma)"
-        />
-
-        <div class="flex justify-between items-start mb-4">
-          <div
-            class="w-12 h-12 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 font-bold text-lg group-hover:bg-sky-600 group-hover:text-white transition-colors"
-          >
-            {{ turma.nome.charAt(0).toUpperCase() }}
+        <div>
+          <div class="flex justify-between items-start mb-4">
+            <div
+              class="w-12 h-12 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 font-bold text-xl group-hover:bg-sky-600 group-hover:text-white transition-colors duration-300"
+            >
+              {{ turma.nome.charAt(0).toUpperCase() }}
+            </div>
+            <Tag
+              :value="turma.nivelAlvo?.nome || 'Multinível'"
+              severity="info"
+              class="text-xs"
+            />
           </div>
-          <Tag :value="turma.nivelAlvo?.nome || 'Multinível'" severity="info" />
-        </div>
 
-        <h3 class="font-bold text-lg text-gray-800 mb-1">{{ turma.nome }}</h3>
+          <h3 class="font-bold text-lg text-gray-800 mb-1 leading-tight">
+            {{ turma.nome }}
+          </h3>
 
-        <div class="flex items-center gap-2 text-gray-500 text-sm mb-4">
-          <i class="pi pi-clock"></i>
-          <span>{{ turma.horario.substring(0, 5) }}</span>
-        </div>
+          <div class="flex items-center gap-2 text-gray-500 text-sm mb-4">
+            <i class="pi pi-clock text-sky-400"></i>
+            <span class="font-medium">{{ turma.horario.substring(0, 5) }}</span>
+          </div>
 
-        <div class="flex flex-wrap gap-1 mb-4">
-          <span
-            v-for="day in formatDays(turma.diasSemana)"
-            :key="day"
-            class="text-[10px] uppercase font-bold px-2 py-1 bg-gray-50 text-gray-600 rounded"
-          >
-            {{ day }}
-          </span>
+          <div class="flex flex-wrap gap-1 mb-4">
+            <span
+              v-for="day in formatDays(turma.diasSemana)"
+              :key="day"
+              class="text-[10px] uppercase font-bold px-2 py-1 bg-slate-50 text-slate-500 rounded-md border border-slate-100"
+            >
+              {{ day }}
+            </span>
+          </div>
         </div>
 
         <div
-          class="pt-4 border-t border-gray-50 flex justify-between items-center"
+          class="pt-4 border-t border-gray-50 flex justify-between items-center mt-auto"
         >
-          <span class="text-xs text-gray-400 font-medium">
-            <i class="pi pi-building mr-1"></i>
-            {{ turma.nomeProfessor || 'Sua Turma' }}
+          <span
+            class="text-xs text-gray-400 font-medium flex items-center gap-1"
+          >
+            <i class="pi pi-user"></i>
+            {{ turma.nomeProfessor || 'Sem prof.' }}
           </span>
+
+          <Button
+            icon="pi pi-trash"
+            text
+            rounded
+            severity="secondary"
+            class="w-8 h-8 !text-gray-300 hover:!text-red-500 hover:bg-red-50 transition-colors"
+            v-tooltip.bottom="'Excluir Turma'"
+            @click="confirmDelete(turma)"
+          />
         </div>
       </div>
     </div>
