@@ -7,6 +7,16 @@ import { useClassesStore } from '@/modules/classes/stores/classes'
 import { useLevelsStore } from '@/modules/levels/stores/levels'
 import { formatDays } from '@/core/utils/formatters'
 
+interface TurmaItem {
+  uuid: string
+  nome: string
+  horario: string
+  diasSemana: string[]
+  nomeProfessor?: string
+  nivelAlvo?: { uuid: string; nome: string; corTouca: string } | null
+  quantidadeAlunos?: number
+}
+
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Dialog from 'primevue/dialog'
@@ -29,7 +39,6 @@ const submitting = ref(false)
 const searchQuery = ref('')
 const academias = ref<any[]>([])
 
-// FORMULÁRIO
 const form = ref({
   nome: '',
   horario: null as Date | null,
@@ -71,17 +80,14 @@ const filteredClasses = computed(() => {
   if (!searchQuery.value) return classesStore.classes
   const lower = searchQuery.value.toLowerCase()
   return classesStore.classes.filter(
-    (c) =>
+    (c: TurmaItem) =>
       c.nome.toLowerCase().includes(lower) ||
       (c.nivelAlvo?.nome && c.nivelAlvo.nome.toLowerCase().includes(lower))
   )
 })
 
 const academiaOptions = computed(() =>
-  academias.value.map((a) => ({
-    label: a.nome,
-    value: a.uuid,
-  }))
+  academias.value.map((a) => ({ label: a.nome, value: a.uuid }))
 )
 
 function openCreateModal() {
@@ -156,13 +162,11 @@ async function saveClass() {
     })
 
   submitting.value = true
-
   try {
     const timeString = form.value.horario.toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit',
     })
-
     const payload = {
       nome: form.value.nome,
       horario: timeString,
@@ -170,9 +174,7 @@ async function saveClass() {
       nivelAlvoId: form.value.nivelAlvoId,
       academiaId: form.value.academiaId,
     }
-
     const res = await classesStore.createClass(payload)
-
     if (res.success) {
       toast.add({
         severity: 'success',
@@ -203,12 +205,12 @@ async function saveClass() {
 <template>
   <div class="max-w-6xl mx-auto p-4 space-y-6">
     <ConfirmDialog />
+
     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
       <div>
         <h1 class="text-3xl font-bold text-gray-800">Minhas Turmas</h1>
         <p class="text-gray-500">Gerencie horários e níveis.</p>
       </div>
-
       <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
         <IconField iconPosition="left" class="w-full sm:w-64">
           <InputIcon class="pi pi-search" />
@@ -269,11 +271,11 @@ async function saveClass() {
 
           <div class="flex flex-wrap gap-1 mb-4">
             <span
-              v-for="day in formatDays(turma.diasSemana)"
-              :key="day"
+              v-for="(dia, i) in formatDays(turma.diasSemana)"
+              :key="`${turma.uuid}-dia-${i}`"
               class="text-[10px] uppercase font-bold px-2 py-1 bg-slate-50 text-slate-500 rounded-md border border-slate-100"
             >
-              {{ day }}
+              {{ dia }}
             </span>
           </div>
         </div>
@@ -287,7 +289,6 @@ async function saveClass() {
             <i class="pi pi-user"></i>
             {{ turma.nomeProfessor || 'Sem prof.' }}
           </span>
-
           <Button
             icon="pi pi-trash"
             text
@@ -323,7 +324,6 @@ async function saveClass() {
               placeholder="00:00"
             />
           </div>
-
           <div class="flex flex-col gap-2">
             <label class="font-bold text-sm text-gray-700">Nível Alvo</label>
             <Select

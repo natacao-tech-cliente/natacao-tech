@@ -1,5 +1,15 @@
-export const formatDays = (days: string[]) => {
-  if (!days || days.length === 0) return 'A definir'
+export const formatDays = (
+  days: string[] | string | null | undefined
+): string[] => {
+  if (!days) return []
+
+  const daysArray: string[] = Array.isArray(days)
+    ? days
+    : String(days)
+        .split(',')
+        .map((d) => d.trim())
+
+  if (daysArray.length === 0) return []
 
   const map: Record<string, string> = {
     SEGUNDA: 'Seg',
@@ -20,7 +30,8 @@ export const formatDays = (days: string[]) => {
     'SABADO',
     'DOMINGO',
   ]
-  const sorted = [...days].sort((a, b) => order.indexOf(a) - order.indexOf(b))
 
-  return sorted.map((d) => map[d] || d)
+  return [...daysArray]
+    .sort((a, b) => order.indexOf(a) - order.indexOf(b))
+    .map((d) => map[d] ?? d)
 }
