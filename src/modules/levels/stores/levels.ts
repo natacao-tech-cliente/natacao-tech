@@ -12,8 +12,13 @@ export const useLevelsStore = defineStore('levels', () => {
     try {
       const response = await api.get<NivelDTO[]>('/api/niveis')
       levels.value = response.data
-    } catch (error) {
-      console.error('Erro ao buscar níveis:', error)
+    } catch (error: any) {
+      const status = error?.response?.status
+      if (status === 403) {
+        console.error('Acesso negado ao buscar níveis. Verifique as permissões do usuário ou o CORS do backend.')
+      } else {
+        console.error('Erro ao buscar níveis:', error)
+      }
     } finally {
       loading.value = false
     }
