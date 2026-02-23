@@ -12,8 +12,8 @@ interface TurmaItem {
   nome: string
   horario: string
   diasSemana: string[]
-  nomeProfessor?: string
-  nivelAlvo?: { uuid: string; nome: string; corTouca: string } | null
+  nomeProfessor?: string | null
+  nivelAlvo?: { uuid: string; nome: string; corTouca?: string | null } | null
   quantidadeAlunos?: number
 }
 
@@ -23,7 +23,6 @@ import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
 import MultiSelect from 'primevue/multiselect'
 import Select from 'primevue/select'
-import DatePicker from 'primevue/datepicker'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -41,7 +40,7 @@ const academias = ref<any[]>([])
 
 const form = ref({
   nome: '',
-  horario: null as Date | null,
+  horario: '',
   diasSemana: [] as string[],
   nivelAlvoId: null as string | null,
   academiaId: '',
@@ -93,7 +92,7 @@ const academiaOptions = computed(() =>
 function openCreateModal() {
   form.value = {
     nome: '',
-    horario: null,
+    horario: '',
     diasSemana: [],
     nivelAlvoId: null,
     academiaId: form.value.academiaId || academias.value[0]?.uuid || '',
@@ -163,13 +162,9 @@ async function saveClass() {
 
   submitting.value = true
   try {
-    const timeString = form.value.horario.toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
     const payload = {
       nome: form.value.nome,
-      horario: timeString,
+      horario: form.value.horario,
       diasSemana: form.value.diasSemana,
       nivelAlvoId: form.value.nivelAlvoId,
       academiaId: form.value.academiaId,
@@ -317,11 +312,10 @@ async function saveClass() {
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
             <label class="font-bold text-sm text-gray-700">Horário</label>
-            <DatePicker
+            <InputText
               v-model="form.horario"
-              timeOnly
-              hourFormat="24"
-              placeholder="00:00"
+              type="time"
+              class="w-full"
             />
           </div>
           <div class="flex flex-col gap-2">
