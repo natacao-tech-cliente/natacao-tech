@@ -12,7 +12,13 @@ interface TurmaItem {
   nome: string
   horario: string
   diasSemana: string[]
-  nomeProfessor?: string | null
+  professor?: {
+    uuid: string
+    nome: string
+    email: string
+    nomeAcademia: string
+    cargo?: string | null
+  } | null
   nivelAlvo?: { uuid: string; nome: string; corTouca?: string | null } | null
   quantidadeAlunos?: number
 }
@@ -23,6 +29,7 @@ import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
 import MultiSelect from 'primevue/multiselect'
 import Select from 'primevue/select'
+import DatePicker from 'primevue/datepicker'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -40,7 +47,7 @@ const academias = ref<any[]>([])
 
 const form = ref({
   nome: '',
-  horario: '',
+  horario: null as Date | null,
   diasSemana: [] as string[],
   nivelAlvoId: null as string | null,
   academiaId: '',
@@ -92,7 +99,7 @@ const academiaOptions = computed(() =>
 function openCreateModal() {
   form.value = {
     nome: '',
-    horario: '',
+    horario: null,
     diasSemana: [],
     nivelAlvoId: null,
     academiaId: form.value.academiaId || academias.value[0]?.uuid || '',
@@ -162,9 +169,13 @@ async function saveClass() {
 
   submitting.value = true
   try {
+    const timeString = form.value.horario.toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
     const payload = {
       nome: form.value.nome,
-      horario: form.value.horario,
+      horario: timeString,
       diasSemana: form.value.diasSemana,
       nivelAlvoId: form.value.nivelAlvoId,
       academiaId: form.value.academiaId,
@@ -282,7 +293,7 @@ async function saveClass() {
             class="text-xs text-gray-400 font-medium flex items-center gap-1"
           >
             <i class="pi pi-user"></i>
-            {{ turma.nomeProfessor || 'Sem prof.' }}
+            {{ turma.professor?.nome || 'Sem prof.' }}
           </span>
           <Button
             icon="pi pi-trash"
@@ -312,10 +323,11 @@ async function saveClass() {
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
             <label class="font-bold text-sm text-gray-700">Horário</label>
-            <InputText
+            <DatePicker
               v-model="form.horario"
-              type="time"
-              class="w-full"
+              timeOnly
+              hourFormat="24"
+              placeholder="00:00"
             />
           </div>
           <div class="flex flex-col gap-2">

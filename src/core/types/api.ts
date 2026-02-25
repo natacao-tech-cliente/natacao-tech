@@ -4,12 +4,20 @@ export interface NivelDTO {
   corTouca?: string | null
 }
 
+export interface ProfessorResumoDTO {
+  uuid: string
+  nome: string
+  email: string
+  nomeAcademia: string
+  cargo?: string | null
+}
+
 export interface TurmaDTO {
   uuid: string
   nome: string
   horario: string
   diasSemana: string[]
-  nomeProfessor?: string | null
+  professor?: ProfessorResumoDTO | null
   nivelAlvo?: { uuid: string; nome: string; corTouca?: string | null } | null
   quantidadeAlunos?: number
 }

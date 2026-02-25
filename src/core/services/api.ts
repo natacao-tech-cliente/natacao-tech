@@ -7,6 +7,12 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 const MAX_RETRIES = 2
 const RETRY_DELAY_MS = 1500
 
+function limparSessao() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  localStorage.removeItem('role')
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '',
   timeout: 40_000,
@@ -28,11 +34,18 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const config = error.config as RetryConfig
+    const status = error.response?.status
 
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      localStorage.removeItem('role')
+    if (status === 401) {
+      limparSessao()
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+      return Promise.reject(error)
+    }
+
+    if (status === 403) {
+      limparSessao()
       if (window.location.pathname !== '/login') {
         window.location.href = '/login'
       }
