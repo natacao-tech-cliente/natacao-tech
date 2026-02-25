@@ -13,7 +13,6 @@ interface JwtPayload {
 const ROLES_VALIDAS = ['ADMIN', 'DIRETOR', 'COORDENADOR', 'PROFESSOR'] as const
 type RoleValida = (typeof ROLES_VALIDAS)[number]
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 function decodeJwtPayload(token: string): JwtPayload | null {
   try {
     const [, payload] = token.split('.')
@@ -27,9 +26,10 @@ function decodeJwtPayload(token: string): JwtPayload | null {
 
 function isTokenExpired(token: string): boolean {
   const payload = decodeJwtPayload(token)
-  if (!payload?.exp) return true
+  if (!payload?.exp) return false
   const nowSeconds = Math.floor(Date.now() / 1000)
-  return payload.exp < nowSeconds
+  const CLOCK_SKEW_SECONDS = 60
+  return payload.exp < nowSeconds - CLOCK_SKEW_SECONDS
 }
 
 function sanitizarRole(role: string | null): RoleValida | null {
@@ -82,13 +82,12 @@ export const useAuthStore = defineStore('auth', () => {
       })
 
       const tokenRecebido: string = response.data.token
-      const payload = decodeJwtPayload(tokenRecebido)
-
-      if (!payload || isTokenExpired(tokenRecebido)) {
-        return { success: false, error: 'Token inválido recebido do servidor.' }
+      if (!tokenRecebido) {
+        return { success: false, error: 'Resposta inválida do servidor.' }
       }
 
-      const roleDoToken = sanitizarRole(payload.role ?? null)
+      const payload = decodeJwtPayload(tokenRecebido)
+      const roleDoToken = sanitizarRole(payload?.role ?? null)
 
       localStorage.setItem('token', tokenRecebido)
       localStorage.setItem('user', email)

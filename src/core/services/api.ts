@@ -44,15 +44,8 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (status === 403) {
-      limparSessao()
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login'
-      }
-      return Promise.reject(error)
-    }
-
-    const isTimeout = error.code === 'ECONNABORTED' || error.message?.includes('timeout')
+    const isTimeout =
+      error.code === 'ECONNABORTED' || error.message?.includes('timeout')
     const isNetworkError = !error.response && error.code !== 'ERR_CANCELED'
 
     if ((isTimeout || isNetworkError) && config) {
