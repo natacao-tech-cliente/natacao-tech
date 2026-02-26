@@ -150,7 +150,7 @@ const academiaOptions = computed(() =>
 )
 
 onMounted(async () => {
-  const calls: Promise<any>[] = [
+  const calls: Promise<void>[] = [
     carregarAcademias(),
     carregarNiveis(),
     carregarTurmas(),
@@ -175,15 +175,13 @@ async function carregarProfessores() {
   }
 }
 
-function abrirCriarProf() {
+async function abrirCriarProf() {
+  if (academias.value.length === 0) {
+    await carregarAcademias()
+  }
   editandoProf.value = false
   uuidProf.value = null
-  formProf.value = {
-    nome: '',
-    email: '',
-    senha: '',
-    academiaId: academias.value[0]?.uuid || '',
-  }
+  formProf.value = { nome: '', email: '', senha: '', academiaId: '' }
   errosProf.value = { nome: '', email: '', senha: '', academiaId: '' }
   modalProf.value = true
 }
@@ -359,7 +357,7 @@ function rebaixarProfessor(prof: Professor) {
 
 function abrirPromoverDiretor(prof: Professor) {
   profParaPromover.value = prof
-  academiaIdParaDiretor.value = academias.value[0]?.uuid ?? ''
+  academiaIdParaDiretor.value = ''
   modalPromoverDiretor.value = true
 }
 
@@ -782,7 +780,6 @@ function diasAbrev(dias: string[]) {
             {{ academias.length }}
           </span>
         </Tab>
-
         <Tab v-if="isCoordenador" value="turmas">
           <i class="pi pi-calendar mr-2"></i>
           Turmas
@@ -897,7 +894,6 @@ function diasAbrev(dias: string[]) {
                         v-tooltip.top="'Editar'"
                         @click="abrirEditarProf(prof)"
                       />
-
                       <Button
                         v-if="isDiretor && prof.cargo === 'PROFESSOR'"
                         icon="pi pi-arrow-up"
@@ -1249,7 +1245,21 @@ function diasAbrev(dias: string[]) {
             <label class="text-sm font-semibold text-slate-700"
               >Academia <span class="text-red-500">*</span></label
             >
+            <div
+              v-if="loadingAcad"
+              class="flex items-center gap-2 text-sm text-slate-400 py-2"
+            >
+              <i class="pi pi-spin pi-spinner"></i> Carregando academias...
+            </div>
+            <div
+              v-else-if="academiaOptions.length === 0"
+              class="text-sm text-red-500 py-2"
+            >
+              <i class="pi pi-exclamation-circle mr-1"></i>
+              Nenhuma academia cadastrada. Cadastre uma academia primeiro.
+            </div>
             <Select
+              v-else
               v-model="formProf.academiaId"
               :options="academiaOptions"
               optionLabel="label"
@@ -1292,6 +1302,7 @@ function diasAbrev(dias: string[]) {
             :label="editandoProf ? 'Salvar' : 'Cadastrar'"
             icon="pi pi-check"
             :loading="submittingProf"
+            :disabled="!editandoProf && academiaOptions.length === 0"
             @click="salvarProf"
           />
         </div>
