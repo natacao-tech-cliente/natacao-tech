@@ -12,6 +12,7 @@ const DashboardView = () =>
 const StudentsView = () => import('@/modules/students/views/StudentsView.vue')
 const ReportsView = () => import('@/modules/reports/views/ReportsView.vue')
 const ClassesView = () => import('@/modules/classes/views/ClassesView.vue')
+const GuiaView = () => import('@/modules/guia/views/GuiaView.vue')
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -50,7 +51,11 @@ const router = createRouter({
           name: 'perfil',
           component: () => import('@/modules/profile/views/ProfileView.vue'),
         },
-
+        {
+          path: 'guia',
+          name: 'guia',
+          component: GuiaView,
+        },
         {
           path: 'admin/usuarios',
           name: 'admin-usuarios',
