@@ -1,17 +1,38 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/core/services/api'
-import type { AlunoDTO } from '@/core/types/api'
+
+export interface Student {
+  id: string
+  name: string
+  age: number
+  level: string
+  classIds: string[]
+  turmaId?: string | null
+  nomeTurma?: string
+  status: 'active' | 'inactive'
+  contact: string
+}
 
 export const useStudentsStore = defineStore('students', () => {
-  const students = ref<AlunoDTO[]>([])
+  const students = ref<Student[]>([])
   const loading = ref(false)
 
   async function fetchStudents() {
     loading.value = true
     try {
       const response = await api.get('/api/alunos')
-      students.value = response.data
+      students.value = response.data.map((a: any) => ({
+        id: a.uuid,
+        name: a.nome,
+        age: a.idade ?? 0,
+        level: a.nivelAtual || 'Sem nível',
+        turmaId: a.turmaId || null,
+        nomeTurma: a.nomeTurma,
+        classIds: [],
+        status: a.ativo !== false ? 'active' : 'inactive',
+        contact: a.telefone || '',
+      }))
     } catch (error) {
       console.error('Erro ao buscar alunos:', error)
     } finally {
@@ -19,38 +40,38 @@ export const useStudentsStore = defineStore('students', () => {
     }
   }
 
-  async function fetchStudentsByClass(turmaUuid: string) {
-    loading.value = true
+  async function addStudent(payload: any) {
     try {
-      const response = await api.get(`/api/turmas/${turmaUuid}/alunos`)
-
-      students.value = response.data.map((aluno: any) => ({
-        uuid: aluno.uuid,
-        nome: aluno.nome,
-        nivelAtual: aluno.nivel,
-        corTouca: aluno.corTouca,
-        nomeTurma: 'N/A',
-        nomeAcademia: 'N/A',
-        ativo: true,
-      }))
+      await api.post('/api/alunos', payload)
+      await fetchStudents()
     } catch (error) {
-      console.error('Erro ao buscar alunos da turma:', error)
-      students.value = []
-    } finally {
-      loading.value = false
+      console.error('Erro ao criar aluno:', error)
+      throw error
     }
   }
 
-  async function transferStudent(studentId: string, newClassId: string) {
+  async function updateStudent(id: string, payload: any) {
     try {
-      await api.patch(`/api/alunos/${studentId}`, {
-        turmaId: newClassId,
-      })
+      await api.put(`/api/alunos/${id}`, payload)
+
+      if (payload.novaTurmaId) {
+        await api.patch(`/api/alunos/${id}/transferencia`, {
+          novaTurmaId: payload.novaTurmaId,
+        })
+      }
       await fetchStudents()
-      return { success: true }
     } catch (error) {
-      console.error('Erro ao transferir aluno:', error)
-      return { success: false, error }
+      console.error('Erro ao atualizar aluno:', error)
+      throw error
+    }
+  }
+
+  async function deleteStudent(id: string) {
+    try {
+      await api.delete(`/api/alunos/${id}`)
+      students.value = students.value.filter((s) => s.id !== id)
+    } catch (error) {
+      console.error('Erro ao excluir aluno:', error)
     }
   }
 
@@ -58,7 +79,8 @@ export const useStudentsStore = defineStore('students', () => {
     students,
     loading,
     fetchStudents,
-    fetchStudentsByClass,
-    transferStudent,
+    addStudent,
+    updateStudent,
+    deleteStudent,
   }
 })

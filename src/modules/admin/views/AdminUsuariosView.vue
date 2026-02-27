@@ -17,10 +17,12 @@ import TabPanel from 'primevue/tabpanel'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import ConfirmDialog from 'primevue/confirmdialog'
+import Tooltip from 'primevue/tooltip'
 
 const toast = useToast()
 const confirm = useConfirm()
 const auth = useAuthStore()
+const vTooltip = Tooltip
 
 const isAdmin = computed(() => auth.role === 'ADMIN')
 const isDiretor = computed(() => ['ADMIN', 'DIRETOR'].includes(auth.role ?? ''))

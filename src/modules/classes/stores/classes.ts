@@ -27,9 +27,23 @@ export const useClassesStore = defineStore('classes', () => {
       return { success: true }
     } catch (error: any) {
       console.error('Erro ao criar turma:', error)
+
+      const data = error.response?.data
+      let msg = 'Erro ao processar a requisição'
+
+      if (data) {
+        if (data.message) {
+          msg = data.message
+        } else if (data.erros && Array.isArray(data.erros)) {
+          msg = data.erros.map((e: any) => `${e.campo}: ${e.erro}`).join(', ')
+        } else if (typeof data === 'string') {
+          msg = data
+        }
+      }
+
       return {
         success: false,
-        error: error.response?.data?.message || 'Erro desconhecido',
+        error: msg,
       }
     } finally {
       loading.value = false

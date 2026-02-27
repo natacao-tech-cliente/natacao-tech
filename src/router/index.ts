@@ -43,7 +43,15 @@ const router = createRouter({
           component: AssessmentsView,
         },
         { path: 'attendance', name: 'attendance', component: AttendanceView },
-        { path: 'students', name: 'students', component: StudentsView },
+        {
+          path: 'students',
+          name: 'students',
+          component: StudentsView,
+          meta: {
+            requiresAuth: true,
+            allowedRoles: ['ADMIN', 'DIRETOR', 'COORDENADOR'],
+          },
+        },
         { path: 'reports', name: 'reports', component: ReportsView },
         { path: 'classes', name: 'classes', component: ClassesView },
         {
