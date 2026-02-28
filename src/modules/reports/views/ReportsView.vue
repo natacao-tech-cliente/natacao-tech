@@ -33,10 +33,24 @@ const studentOptions = computed(() => {
   if (!Array.isArray(studentsStore.students)) return []
 
   return studentsStore.students.map((s: any) => ({
-    label: s.name,
-    value: s.id,
+    label: s.nome,
+    value: s.uuid,
   }))
 })
+
+function sendToWhatsApp() {
+  if (!selectedReport.value) return
+
+  const text =
+    `Olá! Confira o relatório de natação:\n` +
+    `📅 Data: ${selectedReport.value.data}\n` +
+    `🏊 Nível: ${selectedReport.value.nivel}\n` +
+    `⭐ Pontuação: ${selectedReport.value.pontuacao}\n` +
+    `💬 Feedback: ${selectedReport.value.feedback}`
+
+  const url = `https://wa.me/?text=${encodeURIComponent(text)}`
+  window.open(url, '_blank')
+}
 
 async function fetchHistory() {
   if (!selectedStudent.value) return
@@ -255,6 +269,13 @@ function getScoreColor(score: number) {
           class="w-full py-3"
           :loading="downloading"
           @click="downloadPDF"
+        />
+        <Button
+          label="Enviar por WhatsApp"
+          icon="pi pi-whatsapp"
+          severity="success"
+          class="w-full py-3"
+          @click="sendToWhatsApp"
         />
       </div>
     </Dialog>
