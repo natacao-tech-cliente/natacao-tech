@@ -50,6 +50,7 @@ interface Historico {
   observacoes: string | null
 }
 
+const observacoes = ref<Record<string, string>>({})
 const etapa = ref<number>(1)
 
 const turmas = ref<Turma[]>([])
@@ -298,7 +299,7 @@ async function salvarAvaliacao() {
             habilidadesAprovadasIds: habilidadesAtivas.value
               .filter((h) => respostas.value[h.uuid]?.[aluno.uuid] === true)
               .map((h) => h.uuid),
-            observacao: null,
+            observacao: observacoes.value[aluno.uuid] || null,
             promoverManual: false,
           })),
         }
@@ -330,6 +331,7 @@ function reiniciar() {
   habilidades.value = []
   alunosSelecionados.value = new Set()
   respostas.value = {}
+  observacoes.value = {}
   perguntaAtual.value = 0
   buscaAluno.value = ''
 }
@@ -961,6 +963,18 @@ function avatarTxtCls(resp: boolean | undefined): string {
               "
               :style="{ width: `${item.pct}%` }"
             ></div>
+          </div>
+
+          <div class="mt-4 mb-4 pt-4 border-t border-slate-50">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5"
+              >Feedback / Observações (Opcional)</label
+            >
+            <textarea
+              v-model="observacoes[item.aluno.uuid]"
+              rows="2"
+              placeholder="Adicione um comentário sobre o desempenho do aluno para constar no relatório..."
+              class="w-full text-sm border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100 resize-none bg-slate-50"
+            ></textarea>
           </div>
 
           <div class="flex flex-wrap gap-1.5">
