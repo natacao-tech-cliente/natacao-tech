@@ -514,42 +514,38 @@ function validarAcad(): boolean {
 async function salvarAcad() {
   if (!validarAcad()) return
   submittingAcad.value = true
+
   try {
-    const dadosJson = JSON.stringify({
+    const payload = {
       nome: formAcad.value.nome,
       endereco: formAcad.value.endereco,
       telefone: formAcad.value.telefone,
       email: formAcad.value.email || null,
       cnpj: formAcad.value.cnpj || null,
-    })
-    const formData = new FormData()
-    formData.append(
-      'dados',
-      new Blob([dadosJson], { type: 'application/json' })
-    )
-    if (logoAcad.value) {
-      formData.append('logo', logoAcad.value)
     }
 
-    if (editandoAcad.value && uuidAcad.value) {
-      await api.put(`/api/academias/${uuidAcad.value}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      toast.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Academia atualizada!',
-      })
+    let currentUuid = uuidAcad.value
+
+    if (editandoAcad.value && currentUuid) {
+      await api.put(`/api/academias/${currentUuid}`, payload)
     } else {
-      await api.post('/api/academias', formData, {
+      const { data } = await api.post('/api/academias', payload)
+      currentUuid = data.uuid
+    }
+
+    if (logoAcad.value && currentUuid) {
+      const formLogo = new FormData()
+      formLogo.append('logo', logoAcad.value)
+      await api.post(`/api/academias/${currentUuid}/logo`, formLogo, {
         headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      toast.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Academia cadastrada!',
       })
     }
+
+    toast.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: 'Academia salva com sucesso!',
+    })
     modalAcad.value = false
     await carregarAcademias()
   } catch (e: any) {
