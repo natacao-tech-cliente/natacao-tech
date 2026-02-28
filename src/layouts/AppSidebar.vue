@@ -175,29 +175,55 @@ function isActive(path: string) {
         >
           Administração
         </p>
+
         <a
           @click="navigate('/admin/usuarios')"
           class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 font-medium group relative overflow-hidden"
           :class="
-            isActive('/admin')
+            isActive('/admin/usuarios')
               ? 'bg-sky-50 text-sky-700 shadow-sm ring-1 ring-sky-100'
               : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
           "
         >
           <div
-            v-if="isActive('/admin')"
+            v-if="isActive('/admin/usuarios')"
             class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-sky-500 rounded-r-full"
           />
           <i
             :class="[
               'pi pi-users text-lg transition-transform group-hover:scale-110 duration-200',
-              isActive('/admin')
+              isActive('/admin/usuarios')
                 ? 'text-sky-600'
                 : 'text-slate-400 group-hover:text-slate-600',
             ]"
           />
           <span>Usuários</span>
         </a>
+
+        <a
+          @click="navigate('/admin/academias')"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 font-medium group relative overflow-hidden"
+          :class="
+            isActive('/admin/academias')
+              ? 'bg-sky-50 text-sky-700 shadow-sm ring-1 ring-sky-100'
+              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+          "
+        >
+          <div
+            v-if="isActive('/admin/academias')"
+            class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-sky-500 rounded-r-full"
+          />
+          <i
+            :class="[
+              'pi pi-building text-lg transition-transform group-hover:scale-110 duration-200',
+              isActive('/admin/academias')
+                ? 'text-sky-600'
+                : 'text-slate-400 group-hover:text-slate-600',
+            ]"
+          />
+          <span>Academias</span>
+        </a>
+
         <a
           @click="navigate('/students')"
           class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 font-medium group relative overflow-hidden"

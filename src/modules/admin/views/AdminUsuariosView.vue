@@ -888,15 +888,7 @@ function diasAbrev(dias: string[]) {
             {{ professores.length }}
           </span>
         </Tab>
-        <Tab v-if="isDiretor" value="academias">
-          <i class="pi pi-building mr-2"></i>
-          Academias
-          <span
-            class="ml-2 bg-slate-100 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full"
-          >
-            {{ academias.length }}
-          </span>
-        </Tab>
+
         <Tab v-if="isCoordenador" value="turmas">
           <i class="pi pi-calendar mr-2"></i>
           Turmas
@@ -1047,112 +1039,6 @@ function diasAbrev(dias: string[]) {
                   </span>
                   <p class="text-xs text-slate-500 mt-2 leading-relaxed">
                     {{ item.desc }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </TabPanel>
-
-        <TabPanel value="academias">
-          <div class="space-y-4 pt-4">
-            <div
-              class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
-            >
-              <IconField iconPosition="left" class="w-full sm:w-72">
-                <InputIcon class="pi pi-search" />
-                <InputText
-                  v-model="buscaAcad"
-                  placeholder="Buscar academia..."
-                  class="w-full"
-                />
-              </IconField>
-              <Button
-                label="Nova Academia"
-                icon="pi pi-building"
-                @click="abrirCriarAcad"
-                class="w-full sm:w-auto shrink-0"
-              />
-            </div>
-
-            <div v-if="loadingAcad" class="flex justify-center py-16">
-              <i class="pi pi-spin pi-spinner text-3xl text-sky-500"></i>
-            </div>
-
-            <div
-              v-else-if="academiasFiltradas.length === 0"
-              class="text-center py-16 bg-white rounded-xl border border-dashed border-slate-200"
-            >
-              <i class="pi pi-building text-4xl text-slate-300 mb-3 block"></i>
-              <p class="text-slate-500 font-medium">
-                Nenhuma academia encontrada
-              </p>
-              <Button
-                label="Cadastrar primeira academia"
-                size="small"
-                text
-                class="mt-3"
-                @click="abrirCriarAcad"
-              />
-            </div>
-
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div
-                v-for="acad in academiasFiltradas"
-                :key="acad.uuid"
-                class="bg-white rounded-xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-shadow group"
-              >
-                <div class="flex items-start justify-between mb-3">
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white shrink-0"
-                    >
-                      <i class="pi pi-building text-sm"></i>
-                    </div>
-                    <div>
-                      <p class="font-semibold text-slate-800 text-sm">
-                        {{ acad.nome }}
-                      </p>
-                      <p v-if="acad.cnpj" class="text-xs text-slate-400">
-                        {{ acad.cnpj }}
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Button
-                      icon="pi pi-pencil"
-                      text
-                      rounded
-                      size="small"
-                      severity="secondary"
-                      v-tooltip.top="'Editar'"
-                      @click="abrirEditarAcad(acad)"
-                    />
-                    <Button
-                      icon="pi pi-trash"
-                      text
-                      rounded
-                      size="small"
-                      severity="danger"
-                      v-tooltip.top="'Remover'"
-                      @click="excluirAcad(acad)"
-                    />
-                  </div>
-                </div>
-                <div class="space-y-1.5 text-xs text-slate-500">
-                  <p>
-                    <i class="pi pi-map-marker mr-2 text-slate-400"></i
-                    >{{ acad.endereco }}
-                  </p>
-                  <p>
-                    <i class="pi pi-phone mr-2 text-slate-400"></i
-                    >{{ acad.telefone }}
-                  </p>
-                  <p v-if="acad.email">
-                    <i class="pi pi-envelope mr-2 text-slate-400"></i
-                    >{{ acad.email }}
                   </p>
                 </div>
               </div>

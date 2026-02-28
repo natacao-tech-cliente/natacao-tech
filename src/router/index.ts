@@ -89,6 +89,15 @@ const router = createRouter({
             allowedRoles: ['ADMIN', 'DIRETOR', 'COORDENADOR'],
           },
         },
+        {
+          path: 'admin/academias',
+          name: 'admin-academias',
+          component: () => import('@/modules/admin/views/AcademiasView.vue'),
+          meta: {
+            requiresAuth: true,
+            allowedRoles: ['ADMIN', 'DIRETOR'],
+          },
+        },
 
         {
           path: 'admin/habilidades',
