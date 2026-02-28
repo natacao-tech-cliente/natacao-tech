@@ -7,9 +7,7 @@ export interface Student {
   name: string
   age: number
   level: string
-  classIds: string[]
-  turmaId?: string | null
-  nomeTurma?: string
+  turmas: string
   status: 'active' | 'inactive'
   contact: string
 }
@@ -33,9 +31,7 @@ export const useStudentsStore = defineStore('students', () => {
         name: a.nome,
         age: a.idade ?? 0,
         level: a.nivelAtual || 'Sem nível',
-        turmaId: a.turmaId || null,
-        nomeTurma: a.nomeTurma,
-        classIds: [],
+        turmas: a.turmas || '',
         status: a.ativo !== false ? 'active' : 'inactive',
         contact: a.telefone || '',
       }))
@@ -61,9 +57,9 @@ export const useStudentsStore = defineStore('students', () => {
     try {
       await api.put(`/api/alunos/${id}`, payload)
 
-      if (payload.novaTurmaId) {
+      if (payload.novasTurmasIds !== undefined) {
         await api.patch(`/api/alunos/${id}/transferencia`, {
-          novasTurmasIds: [payload.novaTurmaId],
+          novasTurmasIds: payload.novasTurmasIds,
         })
       }
       await fetchStudents()

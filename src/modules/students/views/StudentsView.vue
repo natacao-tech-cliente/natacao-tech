@@ -45,12 +45,17 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex flex-wrap gap-1.5">
-                  <span
-                    v-if="student.nomeTurma"
-                    class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium"
+                  <template
+                    v-if="student.turmas && student.turmas !== 'Sem Turma'"
                   >
-                    {{ student.nomeTurma }}
-                  </span>
+                    <span
+                      v-for="turma in student.turmas.split(', ')"
+                      :key="turma"
+                      class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium"
+                    >
+                      {{ turma }}
+                    </span>
+                  </template>
                   <span v-else class="text-slate-400 text-xs italic">
                     Sem turma
                   </span>
@@ -151,7 +156,7 @@
 
             <div class="col-span-2">
               <label class="block text-sm font-semibold text-slate-700 mb-2"
-                >Turma</label
+                >Turmas Múltiplas</label
               >
               <div
                 class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-slate-100 p-2 rounded-lg bg-slate-50"
@@ -162,11 +167,10 @@
                   class="flex items-center space-x-3 bg-white p-2.5 rounded-md border border-slate-100 cursor-pointer hover:border-sky-200 hover:bg-sky-50 transition-colors"
                 >
                   <input
-                    type="radio"
+                    type="checkbox"
                     :value="c.uuid"
-                    v-model="form.turmaId"
-                    name="turmaSelecionada"
-                    class="rounded-full text-sky-500 focus:ring-sky-500 border-slate-300 w-4 h-4"
+                    v-model="form.turmasIds"
+                    class="rounded text-sky-500 focus:ring-sky-500 border-slate-300 w-4 h-4"
                   />
                   <div class="flex flex-col">
                     <span class="text-sm font-semibold text-slate-700">{{
@@ -263,8 +267,7 @@ const form = ref({
   age: 0,
   nivelId: '',
   level: 'Iniciante',
-  classIds: [] as string[],
-  turmaId: null as string | null,
+  turmasIds: [] as string[],
   status: 'active' as 'active' | 'inactive',
   contact: '',
 })
@@ -272,13 +275,24 @@ const form = ref({
 function openModal(student?: any) {
   if (student) {
     editingId.value = student.id
+
+    const selectedClassIds =
+      student.turmas && student.turmas !== 'Sem Turma'
+        ? (student.turmas
+            .split(', ')
+            .map((nome: string) => {
+              const cls = classesStore.classes.find((c) => c.nome === nome)
+              return cls ? cls.uuid : null
+            })
+            .filter(Boolean) as string[])
+        : []
+
     form.value = {
       name: student.name,
       age: student.age,
       nivelId: '',
       level: student.level || 'Iniciante',
-      classIds: student.classIds || [],
-      turmaId: student.turmaId,
+      turmasIds: selectedClassIds,
       status: student.status,
       contact: student.contact,
     }
@@ -289,8 +303,7 @@ function openModal(student?: any) {
       age: 0,
       nivelId: '',
       level: 'Iniciante',
-      classIds: [],
-      turmaId: null,
+      turmasIds: [],
       status: 'active',
       contact: '',
     }
@@ -304,7 +317,7 @@ async function saveStudent() {
       await studentsStore.updateStudent(editingId.value, {
         nome: form.value.name,
         telefoneResponsavel: form.value.contact,
-        novaTurmaId: form.value.turmaId,
+        novasTurmasIds: form.value.turmasIds,
       })
     } else {
       await studentsStore.addStudent({
@@ -317,7 +330,7 @@ async function saveStudent() {
         telefoneResponsavel: form.value.contact,
         nomeResponsavel: 'Responsável',
         nivelId: form.value.nivelId,
-        turmasIds: form.value.turmaId ? [form.value.turmaId] : [],
+        turmasIds: form.value.turmasIds,
       })
     }
     showModal.value = false
