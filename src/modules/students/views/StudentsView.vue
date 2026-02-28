@@ -290,7 +290,7 @@ function openModal(student?: any) {
     form.value = {
       name: student.name,
       age: student.age,
-      nivelId: '',
+      nivelId: student.nivelId,
       level: student.level || 'Iniciante',
       turmasIds: selectedClassIds,
       status: student.status,

@@ -6,6 +6,7 @@ export interface Student {
   id: string
   name: string
   age: number
+  nivelId: string
   level: string
   turmas: string
   status: 'active' | 'inactive'
@@ -29,9 +30,10 @@ export const useStudentsStore = defineStore('students', () => {
       students.value = data.map((a: any) => ({
         id: a.uuid,
         name: a.nome,
-        age: a.idade ?? 0,
+        age: a.idade || 0,
+        nivelId: a.nivelUuid || '',
         level: a.nivelAtual || 'Sem nível',
-        turmas: a.turmas || '',
+        turmas: a.nomesTurmas ? a.nomesTurmas.join(', ') : a.turmas || '',
         status: a.ativo !== false ? 'active' : 'inactive',
         contact: a.telefone || '',
       }))
