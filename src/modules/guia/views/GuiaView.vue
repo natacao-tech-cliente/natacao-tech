@@ -208,24 +208,26 @@ const secoes = [
                       'Cadastrar e remover academias',
                       'Criar professores em qualquer academia',
                       'Promover professores a Diretor',
-                      'Ver todos os dados do sistema',
+                      'Ver dados globais do sistema',
                     ],
-                    naoPode: ['Criar turmas (não possui academia vinculada)'],
+                    naoPode: [
+                      'Criar turmas (não possui academia)',
+                      'Acessar Relatórios de alunos',
+                    ],
                   },
                   {
                     nome: 'DIRETOR',
                     badge: 'bg-blue-100 text-blue-700 border-blue-200',
                     desc: 'Gestão completa de uma academia específica.',
                     pode: [
-                      'Criar e encerrar turmas da sua academia',
-                      'Criar e gerenciar professores',
-                      'Promover professores a Coordenador',
+                      'Criar e encerrar turmas',
+                      'Gerenciar professores e cargos',
                       'Editar dados da academia',
-                      'Ver todos os alunos e turmas',
+                      'Acessar Histórico e Relatórios',
                     ],
                     naoPode: [
                       'Acessar dados de outras academias',
-                      'Promover a Diretor (apenas ADMIN pode)',
+                      'Promover a Diretor (apenas ADMIN)',
                     ],
                   },
                   {
@@ -235,7 +237,6 @@ const secoes = [
                     pode: [
                       'Criar e encerrar turmas',
                       'Matricular e transferir alunos',
-                      'Visualizar professores',
                       'Ver dashboard e relatórios',
                     ],
                     naoPode: [
@@ -251,13 +252,11 @@ const secoes = [
                     pode: [
                       'Ver suas turmas no Dashboard',
                       'Avaliar alunos por habilidade',
-                      'Visualizar histórico de avaliações',
-                      'Alterar a própria senha',
+                      'Visualizar relatórios e histórico',
                     ],
                     naoPode: [
                       'Criar turmas ou alunos',
                       'Ver dados de outros professores',
-                      'Acessar configurações do sistema',
                     ],
                   },
                 ]"
@@ -359,21 +358,20 @@ const secoes = [
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >2</span
                     >Clique em <strong>Nova Academia</strong> e preencha nome,
-                    endereço e telefone (obrigatórios).
+                    endereço e telefone.
                   </li>
                   <li class="flex gap-3 text-sm text-slate-600">
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >3</span
-                    >Faça o upload da <strong>logo</strong> da academia (PNG ou
-                    JPG, máx. 2MB, formato horizontal).
+                    >Faça o upload da <strong>logo</strong> (PNG ou JPG, máx.
+                    2MB).
                   </li>
                   <li class="flex gap-3 text-sm text-slate-600">
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >4</span
-                    >Salve e depois vincule professores e crie turmas para essa
-                    academia.
+                    >Salve e vincule professores.
                   </li>
                 </ol>
               </div>
@@ -394,12 +392,12 @@ const secoes = [
                     1024×1024 pixels
                   </li>
                   <li class="flex gap-2">
-                    <i class="pi pi-times text-red-400"></i>Logos verticais
-                    (altura maior que largura) não são aceitas
+                    <i class="pi pi-times text-red-400"></i>Logos verticais não
+                    são aceitas
                   </li>
                   <li class="flex gap-2">
-                    <i class="pi pi-info-circle text-sky-500"></i>A logo aparece
-                    automaticamente nos relatórios PDF enviados aos responsáveis
+                    <i class="pi pi-info-circle text-sky-500"></i>Aparece nos
+                    relatórios PDF enviados aos responsáveis
                   </li>
                 </ul>
               </div>
@@ -417,8 +415,8 @@ const secoes = [
               <i class="pi pi-user text-sky-500"></i> Professores
             </h2>
             <p class="text-slate-500 text-sm mb-5">
-              Professores são os usuários que acessam o sistema para avaliar
-              alunos. Cada professor é vinculado a uma academia.
+              Usuários que acessam o sistema para avaliar alunos. Vinculados a
+              uma academia.
             </p>
 
             <div class="space-y-5">
@@ -444,15 +442,7 @@ const secoes = [
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >3</span
-                    >Preencha nome, e-mail, senha inicial e selecione a
-                    academia.
-                  </li>
-                  <li class="flex gap-3 text-sm text-slate-600">
-                    <span
-                      class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
-                      >4</span
-                    >O professor poderá acessar o sistema com o e-mail e senha
-                    cadastrados.
+                    >Preencha nome, e-mail, senha e selecione a academia.
                   </li>
                 </ol>
               </div>
@@ -473,8 +463,7 @@ const secoes = [
                         Professor → Coordenador
                       </p>
                       <p class="text-slate-500 text-xs mt-0.5">
-                        Feito por ADMIN ou DIRETOR. O coordenador passa a
-                        gerenciar turmas e alunos.
+                        Feito por ADMIN ou DIRETOR.
                       </p>
                     </div>
                   </div>
@@ -487,8 +476,7 @@ const secoes = [
                         Professor/Coordenador → Diretor
                       </p>
                       <p class="text-slate-500 text-xs mt-0.5">
-                        Feito apenas pelo ADMIN. O diretor precisa ser vinculado
-                        a uma academia no momento da promoção.
+                        Feito apenas pelo ADMIN.
                       </p>
                     </div>
                   </div>
@@ -502,8 +490,7 @@ const secoes = [
                       <p class="font-medium text-slate-700">Rebaixar cargo</p>
                       <p class="text-slate-500 text-xs mt-0.5">
                         ADMIN/DIRETOR pode rebaixar Coordenador → Professor.
-                        Apenas ADMIN pode rebaixar Diretor → Professor
-                        (desvíncula da academia).
+                        Apenas ADMIN rebaixa Diretor.
                       </p>
                     </div>
                   </div>
@@ -515,8 +502,7 @@ const secoes = [
               >
                 <i class="pi pi-info-circle mr-2"></i>
                 Não é possível alterar o cargo de um ADMIN ou DIRETOR
-                diretamente pelos botões de Coordenador. Use os botões ⭐ e ↓
-                que aparecem especificamente para Diretores.
+                diretamente pelos botões de Coordenador. Use os botões ⭐ e ↓.
               </div>
             </div>
           </div>
@@ -532,8 +518,8 @@ const secoes = [
               <i class="pi pi-calendar text-sky-500"></i> Turmas
             </h2>
             <p class="text-slate-500 text-sm mb-5">
-              As turmas agrupam alunos por horário e nível. Cada turma pertence
-              automaticamente à academia do usuário que a criou.
+              Agrupam alunos por horário e nível. Pertencem automaticamente à
+              academia de quem a criou.
             </p>
 
             <div
@@ -541,9 +527,8 @@ const secoes = [
             >
               <i class="pi pi-info-circle shrink-0 mt-0.5"></i>
               <span
-                >ADMIN não cria turmas pois não possui academia vinculada.
-                Turmas são criadas pelo <strong>Diretor</strong> ou
-                <strong>Coordenador</strong>.</span
+                >ADMIN não cria turmas. Turmas são criadas pelo
+                <strong>Diretor</strong> ou <strong>Coordenador</strong>.</span
               >
             </div>
 
@@ -558,8 +543,7 @@ const secoes = [
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >1</span
                     >Vá em <strong>Usuários</strong> → aba
-                    <strong>Turmas</strong>, ou acesse
-                    <strong>Turmas</strong> no menu lateral.
+                    <strong>Turmas</strong>.
                   </li>
                   <li class="flex gap-3 text-sm text-slate-600">
                     <span
@@ -571,14 +555,7 @@ const secoes = [
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >3</span
-                    >Informe o nome, horário de início e fim, dias da semana e o
-                    nível alvo.
-                  </li>
-                  <li class="flex gap-3 text-sm text-slate-600">
-                    <span
-                      class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
-                      >4</span
-                    >Opcionalmente, vincule um professor responsável.
+                    >Informe nome, horários, dias e nível alvo.
                   </li>
                 </ol>
               </div>
@@ -589,8 +566,7 @@ const secoes = [
                     Dias da semana
                   </p>
                   <p class="text-xs text-slate-500">
-                    SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO. Selecione
-                    múltiplos dias.
+                    Selecione múltiplos dias.
                   </p>
                 </div>
                 <div class="bg-slate-50 rounded-xl p-3">
@@ -598,8 +574,7 @@ const secoes = [
                     Encerrar turma
                   </p>
                   <p class="text-xs text-slate-500">
-                    Ao encerrar, os alunos são desvinculados. O histórico de
-                    avaliações é preservado.
+                    Alunos são desvinculados, mas o histórico é preservado.
                   </p>
                 </div>
               </div>
@@ -617,46 +592,37 @@ const secoes = [
               <i class="pi pi-check-square text-sky-500"></i> Avaliações
             </h2>
             <p class="text-slate-500 text-sm mb-5">
-              O professor avalia cada aluno individualmente, marcando as
-              habilidades do nível atual como conquistadas ou não.
+              Avaliação individual de alunos, marcando habilidades conquistadas
+              ou não.
             </p>
 
             <div class="space-y-4">
               <div>
-                <h3 class="font-semibold text-slate-700 mb-3">
-                  Como avaliar um aluno
-                </h3>
+                <h3 class="font-semibold text-slate-700 mb-3">Como avaliar</h3>
                 <ol class="space-y-2">
                   <li class="flex gap-3 text-sm text-slate-600">
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >1</span
-                    >Acesse <strong>Avaliações</strong> no menu lateral.
+                    >Acesse <strong>Avaliações</strong> no menu.
                   </li>
                   <li class="flex gap-3 text-sm text-slate-600">
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >2</span
-                    >Selecione a turma e depois o aluno.
+                    >Selecione turma e aluno.
                   </li>
                   <li class="flex gap-3 text-sm text-slate-600">
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >3</span
-                    >Marque as habilidades conquistadas (SIM/NÃO).
+                    >Marque habilidades (SIM/NÃO) e adicione observações.
                   </li>
                   <li class="flex gap-3 text-sm text-slate-600">
                     <span
                       class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
                       >4</span
-                    >Adicione observações opcionais (feedback ao responsável).
-                  </li>
-                  <li class="flex gap-3 text-sm text-slate-600">
-                    <span
-                      class="w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs shrink-0"
-                      >5</span
-                    >Salve a avaliação. O sistema registra a data
-                    automaticamente.
+                    >Salve a avaliação.
                   </li>
                 </ol>
               </div>
@@ -668,25 +634,21 @@ const secoes = [
                   <i class="pi pi-star-fill"></i> Promoção automática
                 </p>
                 <p class="text-xs">
-                  Quando todas as habilidades de um nível são aprovadas, o
-                  sistema registra que o aluno está apto à promoção. O professor
-                  pode confirmar a promoção e o histórico é registrado.
+                  Sistema indica aptidão quando todas as habilidades são
+                  aprovadas.
                 </p>
               </div>
 
               <div>
                 <p class="font-semibold text-slate-700 mb-2 text-sm">
-                  O que acontece após a avaliação
+                  Após avaliação
                 </p>
                 <div class="space-y-2">
                   <div
                     class="flex gap-2 text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2"
                   >
                     <i class="pi pi-file-pdf text-red-500 shrink-0 mt-0.5"></i>
-                    <span
-                      >Um PDF com os resultados é gerado automaticamente com a
-                      logo da academia.</span
-                    >
+                    <span>PDF gerado com a logo da academia.</span>
                   </div>
                   <div
                     class="flex gap-2 text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2"
@@ -694,19 +656,7 @@ const secoes = [
                     <i
                       class="pi pi-whatsapp text-green-600 shrink-0 mt-0.5"
                     ></i>
-                    <span
-                      >O PDF é enviado via WhatsApp para o telefone do
-                      responsável cadastrado.</span
-                    >
-                  </div>
-                  <div
-                    class="flex gap-2 text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2"
-                  >
-                    <i class="pi pi-history text-sky-500 shrink-0 mt-0.5"></i>
-                    <span
-                      >O histórico fica disponível para consulta futura na tela
-                      de avaliações.</span
-                    >
+                    <span>PDF enviado via WhatsApp.</span>
                   </div>
                 </div>
               </div>
@@ -724,25 +674,33 @@ const secoes = [
               <i class="pi pi-file-pdf text-sky-500"></i> Relatórios
             </h2>
             <p class="text-slate-500 text-sm mb-5">
-              Os relatórios são documentos PDF gerados automaticamente após cada
-              avaliação, contendo o desempenho detalhado do aluno.
+              Documentos PDF gerados automaticamente após cada avaliação.
             </p>
+
+            <div
+              class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-amber-800 flex gap-3 mb-5"
+            >
+              <i class="pi pi-exclamation-triangle shrink-0 mt-0.5"></i>
+              <span
+                >A visualização na aba de Relatórios é restrita a
+                <strong>Diretores, Coordenadores e Professores</strong>. O
+                Administrador não acessa essa área.</span
+              >
+            </div>
 
             <div class="space-y-4">
               <div class="bg-slate-50 rounded-xl p-4">
                 <p class="font-semibold text-slate-700 mb-3 text-sm">
-                  O que contém o relatório
+                  Conteúdo do Relatório
                 </p>
                 <ul class="space-y-2">
                   <li
                     v-for="item in [
                       'Logo da academia e nome do professor',
-                      'Dados do aluno: nome e data de nascimento',
-                      'Data da avaliação',
-                      'Nível avaliado e suas habilidades (SIM/NÃO)',
-                      'Gráfico de pizza com o percentual de aprovação',
-                      'Feedback/observações do professor',
-                      'Rodapé com identificação do sistema',
+                      'Dados do aluno',
+                      'Data e Nível',
+                      'Percentual de aprovação',
+                      'Observações',
                     ]"
                     :key="item"
                     class="flex gap-2 text-xs text-slate-600"
@@ -758,23 +716,15 @@ const secoes = [
                   Envio por WhatsApp
                 </h3>
                 <div class="space-y-2 text-sm text-slate-600">
-                  <p>
-                    O relatório é enviado automaticamente ao responsável pelo
-                    número cadastrado no perfil do aluno. Para o envio
-                    funcionar:
-                  </p>
+                  <p>Enviado ao responsável cadastrado. Requisitos:</p>
                   <ul class="space-y-1 mt-2 text-xs">
                     <li class="flex gap-2">
-                      <i class="pi pi-check text-green-500"></i>O aluno deve ter
-                      telefone do responsável cadastrado
+                      <i class="pi pi-check text-green-500"></i>Telefone
+                      cadastrado
                     </li>
                     <li class="flex gap-2">
-                      <i class="pi pi-check text-green-500"></i>A academia deve
-                      ter a logo cadastrada para aparecer no PDF
-                    </li>
-                    <li class="flex gap-2">
-                      <i class="pi pi-info-circle text-sky-500"></i>Em caso de
-                      falha no envio, o relatório ainda fica salvo no sistema
+                      <i class="pi pi-check text-green-500"></i>Logo da academia
+                      cadastrada
                     </li>
                   </ul>
                 </div>
@@ -787,8 +737,7 @@ const secoes = [
                   <i class="pi pi-cloud-upload"></i> Armazenamento
                 </p>
                 <p>
-                  Os PDFs são armazenados no Supabase Storage. O link permanente
-                  é registrado no histórico de avaliações para acesso posterior.
+                  Armazenados no Supabase Storage. Link permanente no histórico.
                 </p>
               </div>
             </div>
@@ -805,37 +754,29 @@ const secoes = [
               <i class="pi pi-users text-sky-500"></i> Alunos
             </h2>
             <p class="text-slate-500 text-sm mb-5">
-              Os alunos são matriculados nas turmas e avaliados pelos
-              professores. Eles não possuem acesso ao sistema — o contato com os
-              responsáveis é feito exclusivamente via relatórios por WhatsApp.
+              Matriculados nas turmas e avaliados. Contato via WhatsApp com os
+              responsáveis.
             </p>
 
             <div
               class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-amber-800 flex gap-3 mb-5"
             >
               <i class="pi pi-info-circle shrink-0 mt-0.5"></i>
-              <span
-                >Alunos <strong>não fazem login</strong> no sistema. O
-                acompanhamento do progresso é feito pelos responsáveis através
-                dos relatórios PDF enviados por WhatsApp após cada
-                avaliação.</span
-              >
+              <span>Alunos <strong>não fazem login</strong> no sistema.</span>
             </div>
 
             <div class="space-y-4">
               <div>
-                <h3 class="font-semibold text-slate-700 mb-3">
-                  Dados do aluno
-                </h3>
+                <h3 class="font-semibold text-slate-700 mb-3">Dados</h3>
                 <div class="grid grid-cols-2 gap-2">
                   <div
                     v-for="campo in [
                       'Nome completo',
                       'Data de nascimento',
                       'Nome do responsável',
-                      'Telefone (WhatsApp)',
+                      'Telefone',
                       'Nível inicial',
-                      'Turma (opcional)',
+                      'Turma',
                     ]"
                     :key="campo"
                     class="bg-slate-50 rounded-lg px-3 py-2 text-xs text-slate-600 flex items-center gap-2"
@@ -847,22 +788,16 @@ const secoes = [
               </div>
 
               <div>
-                <h3 class="font-semibold text-slate-700 mb-3">
-                  Transferência de turma
-                </h3>
+                <h3 class="font-semibold text-slate-700 mb-3">Transferência</h3>
                 <p class="text-sm text-slate-600">
-                  Um aluno pode ser transferido de turma sem perder o histórico
-                  de avaliações. A transferência é feita pela aba Turmas do
-                  painel de administração.
+                  Feita pela aba Turmas no painel. Mantém o histórico.
                 </p>
               </div>
 
               <div>
                 <h3 class="font-semibold text-slate-700 mb-3">Desligamento</h3>
                 <p class="text-sm text-slate-600">
-                  Ao desligar um aluno, ele é removido do sistema de turmas. O
-                  histórico de avaliações é preservado no banco de dados para
-                  fins de histórico.
+                  Removido das turmas. Histórico preservado.
                 </p>
               </div>
             </div>

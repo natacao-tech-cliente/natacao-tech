@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/core/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
 
+const LandingView = () => import('@/modules/public/views/LandingView.vue')
 const LoginView = () => import('@/modules/auth/views/LoginView.vue')
 const AssessmentsView = () =>
   import('@/modules/assessments/views/AssessmentsView.vue')
@@ -25,6 +26,12 @@ declare module 'vue-router' {
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/welcome',
+      name: 'landing',
+      component: LandingView,
+      meta: { public: true },
+    },
     {
       path: '/login',
       name: 'login',
@@ -112,7 +119,11 @@ router.beforeEach((to, _from, next) => {
   const allowedRoles = to.meta.allowedRoles
 
   if (requiresAuth && !isAuthenticated) {
-    return next('/login')
+    return next('/welcome')
+  }
+
+  if (to.path === '/welcome' && isAuthenticated) {
+    return next('/')
   }
 
   if (to.path === '/login' && isAuthenticated) {
