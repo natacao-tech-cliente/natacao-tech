@@ -56,12 +56,12 @@ const roleLabel = computed(() => {
 
 const roleBadgeCls = computed(() => {
   const map: Record<string, string> = {
-    ADMIN: 'bg-purple-100 text-purple-700',
-    DIRETOR: 'bg-blue-100 text-blue-700',
-    COORDENADOR: 'bg-amber-100 text-amber-700',
-    PROFESSOR: 'bg-sky-100 text-sky-700',
+    ADMIN: 'bg-purple-50 text-purple-700 border-purple-200/60',
+    DIRETOR: 'bg-blue-50 text-blue-700 border-blue-200/60',
+    COORDENADOR: 'bg-amber-50 text-amber-700 border-amber-200/60',
+    PROFESSOR: 'bg-sky-50 text-sky-700 border-sky-200/60',
   }
-  return map[auth.role ?? ''] ?? 'bg-slate-100 text-slate-600'
+  return map[auth.role ?? ''] ?? 'bg-slate-50 text-slate-600 border-slate-200'
 })
 
 function navigate(path: string) {
@@ -80,21 +80,32 @@ function isActive(path: string) {
 </script>
 
 <template>
-  <nav class="h-full w-full bg-white flex flex-col border-r border-slate-100">
+  <nav
+    class="h-full w-full bg-white/95 backdrop-blur-xl flex flex-col border-r border-slate-200/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-20 font-sans"
+  >
     <div
-      class="h-20 flex items-center gap-3 px-5 shrink-0 border-b border-slate-50"
+      class="h-24 flex items-center gap-4 px-6 shrink-0 border-b border-slate-100/60 relative overflow-hidden"
     >
-      <img
-        src="/images/acquOnwhite.jpeg"
-        alt="AcquOn Logo"
-        class="w-10 h-10 rounded-xl shadow-sm object-cover"
-      />
-      <div class="flex flex-col justify-center leading-tight">
-        <span class="font-bold text-xl tracking-tight text-slate-800"
+      <div
+        class="absolute -top-12 -left-12 w-32 h-32 bg-sky-100/50 rounded-full blur-2xl pointer-events-none"
+      ></div>
+
+      <div
+        class="relative w-11 h-11 rounded-2xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-slate-50 flex items-center justify-center p-1 z-10 shrink-0 group"
+      >
+        <img
+          src="/images/acquOnwhite.jpeg"
+          alt="AcquOn Logo"
+          class="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+
+      <div class="flex flex-col justify-center leading-tight z-10 min-w-0">
+        <span class="font-extrabold text-2xl tracking-tight text-slate-800"
           >AcquOn</span
         >
         <span
-          class="text-[10px] uppercase font-bold text-sky-500 tracking-widest"
+          class="text-[9px] uppercase font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-blue-600 tracking-widest mt-0.5"
           >Gestão Inteligente</span
         >
       </div>
@@ -102,42 +113,36 @@ function isActive(path: string) {
 
     <button
       @click="navigate('/perfil')"
-      class="mx-3 mt-4 mb-1 flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 text-left group shrink-0 cursor-pointer"
+      class="mx-4 mt-6 mb-2 flex items-center gap-3 p-3 rounded-[1.25rem] border transition-all duration-300 text-left group shrink-0 cursor-pointer"
       :class="
         isActive('/perfil')
-          ? 'bg-sky-50 border-sky-200 ring-1 ring-sky-100'
-          : 'bg-slate-50 border-slate-100 hover:bg-sky-50 hover:border-sky-200'
+          ? 'bg-sky-50/50 border-sky-200 shadow-[0_4px_12px_rgba(14,165,233,0.05)]'
+          : 'bg-transparent border-transparent hover:bg-slate-50 hover:border-slate-200/60'
       "
     >
       <div
-        class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0"
+        class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-sky-200/50 shrink-0 transition-transform duration-300 group-hover:scale-105"
       >
         {{ iniciais }}
       </div>
       <div class="min-w-0 flex-1 overflow-hidden">
-        <p class="text-xs text-slate-600 truncate font-medium">
+        <p class="text-[13px] text-slate-700 truncate font-bold">
           {{ auth.user }}
         </p>
         <span
-          class="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-full mt-0.5"
+          class="inline-block text-[9px] font-bold px-2 py-0.5 rounded-full mt-1 border"
           :class="roleBadgeCls"
         >
           {{ roleLabel }}
         </span>
       </div>
-      <i
-        class="pi pi-chevron-right text-[11px] shrink-0 transition-colors"
-        :class="
-          isActive('/perfil')
-            ? 'text-sky-400'
-            : 'text-slate-300 group-hover:text-sky-400'
-        "
-      />
     </button>
 
-    <div class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+    <div
+      class="flex-1 overflow-y-auto py-2 flex flex-col gap-1 custom-scrollbar"
+    >
       <p
-        class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-2"
+        class="text-[10px] font-black text-slate-300 uppercase tracking-widest px-6 mb-2 mt-2"
       >
         Menu Principal
       </p>
@@ -146,143 +151,142 @@ function isActive(path: string) {
         v-for="item in menuItems"
         :key="item.route"
         @click="navigate(item.route)"
-        class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 font-medium group relative overflow-hidden"
+        class="flex items-center gap-3.5 px-4 py-3.5 mx-4 rounded-2xl cursor-pointer transition-all duration-300 font-semibold group relative overflow-hidden"
         :class="
           isActive(item.route)
-            ? 'bg-sky-50 text-sky-700 shadow-sm ring-1 ring-sky-100'
-            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+            ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_8px_16px_-4px_rgba(14,165,233,0.4)]'
+            : 'text-slate-500 hover:bg-sky-50/50 hover:text-sky-700'
         "
       >
-        <div
-          v-if="isActive(item.route)"
-          class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-sky-500 rounded-r-full"
-        />
         <i
           :class="[
             item.icon,
-            'text-lg transition-transform group-hover:scale-110 duration-200',
+            'text-[1.1rem] transition-transform group-hover:scale-110 duration-300',
             isActive(item.route)
-              ? 'text-sky-600'
-              : 'text-slate-400 group-hover:text-slate-600',
+              ? 'text-white drop-shadow-md'
+              : 'text-slate-400 group-hover:text-sky-500',
           ]"
         />
-        <span>{{ item.label }}</span>
+        <span class="text-[13px] tracking-wide">{{ item.label }}</span>
       </a>
 
       <template v-if="isDiretorOuAcima">
         <p
-          class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mt-5 mb-2"
+          class="text-[10px] font-black text-slate-300 uppercase tracking-widest px-6 mt-6 mb-2"
         >
           Administração
         </p>
 
         <a
           @click="navigate('/admin/usuarios')"
-          class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 font-medium group relative overflow-hidden"
+          class="flex items-center gap-3.5 px-4 py-3.5 mx-4 rounded-2xl cursor-pointer transition-all duration-300 font-semibold group relative overflow-hidden"
           :class="
             isActive('/admin/usuarios')
-              ? 'bg-sky-50 text-sky-700 shadow-sm ring-1 ring-sky-100'
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_8px_16px_-4px_rgba(14,165,233,0.4)]'
+              : 'text-slate-500 hover:bg-sky-50/50 hover:text-sky-700'
           "
         >
-          <div
-            v-if="isActive('/admin/usuarios')"
-            class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-sky-500 rounded-r-full"
-          />
           <i
             :class="[
-              'pi pi-users text-lg transition-transform group-hover:scale-110 duration-200',
+              'pi pi-users text-[1.1rem] transition-transform group-hover:scale-110 duration-300',
               isActive('/admin/usuarios')
-                ? 'text-sky-600'
-                : 'text-slate-400 group-hover:text-slate-600',
+                ? 'text-white drop-shadow-md'
+                : 'text-slate-400 group-hover:text-sky-500',
             ]"
           />
-          <span>Usuários</span>
+          <span class="text-[13px] tracking-wide">Usuários</span>
         </a>
 
         <a
           @click="navigate('/admin/academias')"
-          class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 font-medium group relative overflow-hidden"
+          class="flex items-center gap-3.5 px-4 py-3.5 mx-4 rounded-2xl cursor-pointer transition-all duration-300 font-semibold group relative overflow-hidden"
           :class="
             isActive('/admin/academias')
-              ? 'bg-sky-50 text-sky-700 shadow-sm ring-1 ring-sky-100'
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_8px_16px_-4px_rgba(14,165,233,0.4)]'
+              : 'text-slate-500 hover:bg-sky-50/50 hover:text-sky-700'
           "
         >
-          <div
-            v-if="isActive('/admin/academias')"
-            class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-sky-500 rounded-r-full"
-          />
           <i
             :class="[
-              'pi pi-building text-lg transition-transform group-hover:scale-110 duration-200',
+              'pi pi-building text-[1.1rem] transition-transform group-hover:scale-110 duration-300',
               isActive('/admin/academias')
-                ? 'text-sky-600'
-                : 'text-slate-400 group-hover:text-slate-600',
+                ? 'text-white drop-shadow-md'
+                : 'text-slate-400 group-hover:text-sky-500',
             ]"
           />
-          <span>Academias</span>
+          <span class="text-[13px] tracking-wide">Academias</span>
         </a>
 
         <a
           @click="navigate('/students')"
-          class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 font-medium group relative overflow-hidden"
+          class="flex items-center gap-3.5 px-4 py-3.5 mx-4 rounded-2xl cursor-pointer transition-all duration-300 font-semibold group relative overflow-hidden"
           :class="
             isActive('/students')
-              ? 'bg-sky-50 text-sky-700 shadow-sm ring-1 ring-sky-100'
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_8px_16px_-4px_rgba(14,165,233,0.4)]'
+              : 'text-slate-500 hover:bg-sky-50/50 hover:text-sky-700'
           "
         >
-          <div
-            v-if="isActive('/students')"
-            class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-sky-500 rounded-r-full"
-          />
           <i
             :class="[
-              'pi pi-user-plus text-lg transition-transform group-hover:scale-110 duration-200',
+              'pi pi-user-plus text-[1.1rem] transition-transform group-hover:scale-110 duration-300',
               isActive('/students')
-                ? 'text-sky-600'
-                : 'text-slate-400 group-hover:text-slate-600',
+                ? 'text-white drop-shadow-md'
+                : 'text-slate-400 group-hover:text-sky-500',
             ]"
           />
-          <span>Alunos</span>
+          <span class="text-[13px] tracking-wide">Alunos</span>
         </a>
       </template>
     </div>
 
-    <div class="px-3 pb-4 pt-2 border-t border-slate-50 shrink-0 space-y-0.5">
+    <div
+      class="p-4 border-t border-slate-100/60 shrink-0 space-y-1 bg-slate-50/30"
+    >
       <a
         @click="navigate('/guia')"
-        class="flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 font-medium group"
+        class="flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-all duration-300 font-semibold group"
         :class="
           isActive('/guia')
-            ? 'bg-sky-50 text-sky-700 ring-1 ring-sky-100'
-            : 'text-slate-400 hover:bg-slate-50 hover:text-slate-700'
+            ? 'bg-sky-100/50 text-sky-700'
+            : 'text-slate-500 hover:bg-white hover:shadow-sm hover:text-slate-800'
         "
       >
         <i
           :class="[
-            'pi pi-book text-base transition-transform group-hover:scale-110 duration-200',
+            'pi pi-book text-[1.1rem] transition-colors',
             isActive('/guia')
               ? 'text-sky-600'
-              : 'text-slate-400 group-hover:text-slate-600',
+              : 'text-slate-400 group-hover:text-sky-500',
           ]"
         />
-        <span class="text-sm">Guia de Uso</span>
+        <span class="text-[13px] tracking-wide">Guia de Uso</span>
       </a>
 
       <button
         @click="logout"
-        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group cursor-pointer"
+        class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all duration-300 group cursor-pointer font-semibold"
       >
         <i
-          class="pi pi-sign-out text-base group-hover:scale-110 transition-transform duration-200"
+          class="pi pi-sign-out text-[1.1rem] text-slate-400 group-hover:text-red-500 transition-colors"
         />
-        <div class="flex flex-col items-start">
-          <span class="font-bold text-sm">Sair</span>
-          <span class="text-[10px] opacity-70">Encerrar sessão</span>
-        </div>
+        <span class="text-[13px] tracking-wide">Sair do Sistema</span>
       </button>
     </div>
   </nav>
 </template>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+</style>
