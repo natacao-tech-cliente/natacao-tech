@@ -130,19 +130,28 @@
                 >Nível</label
               >
               <select
-                v-model="form.level"
-                required
-                class="block w-full rounded-lg border-slate-200 px-3 py-2 focus:border-sky-500 focus:ring-sky-500 text-sm bg-white"
+                v-model="form.nivelId"
+                :required="!editingId"
+                :disabled="!!editingId"
+                class="block w-full rounded-lg border-slate-200 px-3 py-2 focus:border-sky-500 focus:ring-sky-500 text-sm bg-white disabled:bg-slate-100"
               >
-                <option value="Iniciante">Iniciante</option>
-                <option value="Intermediário">Intermediário</option>
-                <option value="Avançado">Avançado</option>
+                <option value="" disabled>Selecione um nível</option>
+                <option
+                  v-for="level in levelsStore.levels"
+                  :key="level.uuid"
+                  :value="level.uuid"
+                >
+                  {{ level.nome }}
+                </option>
               </select>
+              <p v-if="editingId" class="text-[10px] text-slate-400 mt-1">
+                Nível atual: {{ form.level }}
+              </p>
             </div>
 
             <div class="col-span-2">
               <label class="block text-sm font-semibold text-slate-700 mb-2"
-                >Turmas (Selecione uma ou mais)</label
+                >Turma</label
               >
               <div
                 class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-slate-100 p-2 rounded-lg bg-slate-50"
@@ -229,19 +238,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStudentsStore } from '../stores/students'
 import { useClassesStore } from '../../classes/stores/classes'
-import { onMounted } from 'vue'
+import { useLevelsStore } from '../../levels/stores/levels'
 
 const studentsStore = useStudentsStore()
 const classesStore = useClassesStore()
+const levelsStore = useLevelsStore()
 
 const showModal = ref(false)
 const editingId = ref<string | null>(null)
 
 onMounted(async () => {
-  await studentsStore.fetchStudents()
+  await Promise.all([
+    studentsStore.fetchStudents(),
+    classesStore.fetchClasses(),
+    levelsStore.fetchLevels(),
+  ])
 })
 
 const form = ref({
@@ -254,11 +268,6 @@ const form = ref({
   status: 'active' as 'active' | 'inactive',
   contact: '',
 })
-
-function getClassName(classId: string) {
-  const c = classesStore.classes.find((cls) => cls.uuid === classId)
-  return c ? c.nome : 'Turma não encontrada'
-}
 
 function openModal(student?: any) {
   if (student) {
@@ -304,15 +313,16 @@ async function saveStudent() {
           new Date().setFullYear(new Date().getFullYear() - form.value.age)
         )
           .toISOString()
-          .split('T')[0], // Converte idade
+          .split('T')[0],
         telefoneResponsavel: form.value.contact,
-        nomeResponsavel: 'Responsável Padrão',
-        nivelId: 'uuid-do-nivel',
-        turmaId: form.value.turmaId,
+        nomeResponsavel: 'Responsável',
+        nivelId: form.value.nivelId,
+        turmasIds: form.value.turmaId ? [form.value.turmaId] : [],
       })
     }
     showModal.value = false
   } catch (e) {
+    console.error(e)
     alert('Erro ao salvar o aluno. Verifique os dados.')
   }
 }
