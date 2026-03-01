@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import api, { setMemoryRefreshToken } from '@/core/services/api'
+import api from '@/core/services/api'
 import { ROLES_VALIDAS, type RoleValida } from '@/core/types/roles'
 
 function sanitizarRole(role: string | null): RoleValida | null {
@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
     sanitizarRole(localStorage.getItem('role'))
   )
 
-  const token = ref<string | null>(null)
+  const token = ref<string | null>(sessionStorage.getItem('token'))
   const loading = ref(false)
 
   const isAuthenticated = computed(
@@ -51,10 +51,13 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   function checkAuth() {
-    if (!token.value || !isTokenValid(token.value)) {
+    const storedToken = sessionStorage.getItem('token')
+    if (!storedToken || !isTokenValid(storedToken)) {
       _limparSessao()
       return
     }
+    token.value = storedToken
+    api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
   }
 
   async function signIn(email: string, pass: string) {
@@ -78,17 +81,15 @@ export const useAuthStore = defineStore('auth', () => {
         }
       }
 
-      sessionStorage.removeItem('token')
-      sessionStorage.removeItem('refreshToken')
-
       localStorage.setItem('user', userLogin)
       localStorage.setItem('role', roleValidado)
+      sessionStorage.setItem('token', accessToken)
+      sessionStorage.setItem('refreshToken', refreshToken)
 
       user.value = userLogin
       role.value = roleValidado
       token.value = accessToken
 
-      setMemoryRefreshToken(refreshToken)
       api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
 
       return { success: true }
@@ -106,10 +107,11 @@ export const useAuthStore = defineStore('auth', () => {
   function _limparSessao() {
     localStorage.removeItem('user')
     localStorage.removeItem('role')
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('refreshToken')
     user.value = null
     role.value = null
     token.value = null
-    setMemoryRefreshToken(null)
     delete api.defaults.headers.common['Authorization']
   }
 

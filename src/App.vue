@@ -2,7 +2,6 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
-import { RouterView } from 'vue-router'
 
 const toast = useToast()
 
@@ -27,5 +26,5 @@ onUnmounted(() => {
 
 <template>
   <Toast />
-  <RouterView />
+  <router-view />
 </template>
