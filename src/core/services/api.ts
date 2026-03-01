@@ -11,6 +11,12 @@ const RETRY_DELAY_MS = 1500
 let isRefreshing = false
 let failedQueue: any[] = []
 
+export let memoryRefreshToken: string | null = null
+
+export const setMemoryRefreshToken = (token: string | null) => {
+  memoryRefreshToken = token
+}
+
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error)
@@ -22,8 +28,7 @@ const processQueue = (error: any, token: string | null = null) => {
 function limparSessao() {
   localStorage.removeItem('user')
   localStorage.removeItem('role')
-  sessionStorage.removeItem('token')
-  sessionStorage.removeItem('refreshToken')
+  setMemoryRefreshToken(null)
   delete api.defaults.headers.common['Authorization']
 }
 
@@ -45,7 +50,7 @@ api.interceptors.response.use(
         error.response?.data?.mensagem ||
         error.response?.data?.message ||
         'Você não tem permissão para realizar esta ação.'
-      alert(`⛔ Acesso Negado: ${errorMsg}`)
+      window.dispatchEvent(new CustomEvent('api-error', { detail: errorMsg }))
       return Promise.reject(error)
     }
 
@@ -70,9 +75,7 @@ api.interceptors.response.use(
           .catch((err) => Promise.reject(err))
       }
 
-      const currentRefreshToken = sessionStorage.getItem('refreshToken')
-
-      if (!currentRefreshToken) {
+      if (!memoryRefreshToken) {
         limparSessao()
         if (router.currentRoute.value.path !== '/login') router.push('/login')
         return Promise.reject(new Error('Refresh Token ausente'))
@@ -83,16 +86,14 @@ api.interceptors.response.use(
       try {
         const refreshResponse = await axios.post(
           '/auth/refresh',
-          { refreshToken: currentRefreshToken },
+          { refreshToken: memoryRefreshToken },
           { baseURL: api.defaults.baseURL }
         )
 
         const newToken = refreshResponse.data.token
         const newRefreshToken = refreshResponse.data.refreshToken
 
-        sessionStorage.setItem('token', newToken)
-        sessionStorage.setItem('refreshToken', newRefreshToken)
-
+        setMemoryRefreshToken(newRefreshToken)
         api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 
         if (config.headers && typeof config.headers.set === 'function') {

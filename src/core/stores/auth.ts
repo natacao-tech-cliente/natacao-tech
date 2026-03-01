@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/core/services/api'
+import api, { setMemoryRefreshToken } from '@/core/services/api'
 import { ROLES_VALIDAS, type RoleValida } from '@/core/types/roles'
 
 function sanitizarRole(role: string | null): RoleValida | null {
@@ -9,6 +9,19 @@ function sanitizarRole(role: string | null): RoleValida | null {
   return (ROLES_VALIDAS as readonly string[]).includes(role)
     ? (role as RoleValida)
     : null
+}
+
+function isTokenValid(token: string | null): boolean {
+  if (!token) return false
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3 || !parts[1]) return false
+
+    const payload = JSON.parse(atob(parts[1]))
+    return payload.exp * 1000 > Date.now()
+  } catch (e) {
+    return false
+  }
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -19,11 +32,11 @@ export const useAuthStore = defineStore('auth', () => {
     sanitizarRole(localStorage.getItem('role'))
   )
 
-  const token = ref<string | null>(sessionStorage.getItem('token'))
+  const token = ref<string | null>(null)
   const loading = ref(false)
 
   const isAuthenticated = computed(
-    () => !!user.value && !!role.value && !!token.value
+    () => !!user.value && !!role.value && isTokenValid(token.value)
   )
   const userRole = computed(() => role.value)
   const isAdmin = computed(() => role.value === 'ADMIN')
@@ -38,20 +51,10 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   function checkAuth() {
-    const storedRole = localStorage.getItem('role')
-    const storedUser = localStorage.getItem('user')
-    const storedToken = sessionStorage.getItem('token')
-
-    if (!storedUser || !storedRole || !storedToken) {
+    if (!token.value || !isTokenValid(token.value)) {
       _limparSessao()
       return
     }
-
-    user.value = storedUser
-    role.value = sanitizarRole(storedRole)
-    token.value = storedToken
-
-    api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
   }
 
   async function signIn(email: string, pass: string) {
@@ -75,15 +78,17 @@ export const useAuthStore = defineStore('auth', () => {
         }
       }
 
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('refreshToken')
+
       localStorage.setItem('user', userLogin)
       localStorage.setItem('role', roleValidado)
-      sessionStorage.setItem('token', accessToken)
-      sessionStorage.setItem('refreshToken', refreshToken)
 
       user.value = userLogin
       role.value = roleValidado
       token.value = accessToken
 
+      setMemoryRefreshToken(refreshToken)
       api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
 
       return { success: true }
@@ -101,11 +106,10 @@ export const useAuthStore = defineStore('auth', () => {
   function _limparSessao() {
     localStorage.removeItem('user')
     localStorage.removeItem('role')
-    sessionStorage.removeItem('token')
-    sessionStorage.removeItem('refreshToken')
     user.value = null
     role.value = null
     token.value = null
+    setMemoryRefreshToken(null)
     delete api.defaults.headers.common['Authorization']
   }
 
