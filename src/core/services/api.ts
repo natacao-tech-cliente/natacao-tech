@@ -40,6 +40,15 @@ api.interceptors.response.use(
     const config = error.config as RetryConfig
     const status = error.response?.status
 
+    if (status === 403) {
+      const errorMsg =
+        error.response?.data?.mensagem ||
+        error.response?.data?.message ||
+        'Você não tem permissão para realizar esta ação.'
+      alert(`⛔ Acesso Negado: ${errorMsg}`)
+      return Promise.reject(error)
+    }
+
     const endpointsIgnorados = ['/auth/login', '/auth/refresh', '/auth/logout']
     const isUrlIgnorada = endpointsIgnorados.some((url) =>
       config.url?.includes(url)
