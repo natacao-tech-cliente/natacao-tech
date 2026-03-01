@@ -8,10 +8,21 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 const MAX_RETRIES = 2
 const RETRY_DELAY_MS = 1500
 
+let isRefreshing = false
+let failedQueue: any[] = []
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error)
+    else prom.resolve(token)
+  })
+  failedQueue = []
+}
+
 function limparSessao() {
-  localStorage.removeItem('token')
   localStorage.removeItem('user')
   localStorage.removeItem('role')
+  delete api.defaults.headers.common['Authorization']
 }
 
 const api = axios.create({
@@ -21,54 +32,74 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const config = error.config as RetryConfig
     const status = error.response?.status
 
-    if (
-      status === 401 &&
-      !config.url?.includes('/auth/login') &&
-      !config.url?.includes('/auth/refresh')
-    ) {
+    const endpointsIgnorados = ['/auth/login', '/auth/refresh', '/auth/logout']
+    const isUrlIgnorada = endpointsIgnorados.some((url) =>
+      config.url?.includes(url)
+    )
+
+    if (status === 401 && !isUrlIgnorada) {
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            if (config.headers && typeof config.headers.set === 'function') {
+              config.headers.set('Authorization', `Bearer ${token}`)
+            } else {
+              config.headers!.Authorization = `Bearer ${token}`
+            }
+            return api(config)
+          })
+          .catch((err) => Promise.reject(err))
+      }
+
+      const currentToken = api.defaults.headers.common['Authorization']
+
+      if (!currentToken) {
+        limparSessao()
+        if (router.currentRoute.value.path !== '/login') router.push('/login')
+        return Promise.reject(new Error('Token ausente na memória'))
+      }
+
+      isRefreshing = true
+
       try {
         const refreshResponse = await axios.post(
-          `${api.defaults.baseURL}/auth/refresh`,
+          '/auth/refresh',
           {},
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            baseURL: api.defaults.baseURL,
+            headers: { Authorization: currentToken },
           }
         )
 
         const newToken = refreshResponse.data.token
-        localStorage.setItem('token', newToken)
+        api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 
-        config.headers!.Authorization = `Bearer ${newToken}`
+        if (config.headers && typeof config.headers.set === 'function') {
+          config.headers.set('Authorization', `Bearer ${newToken}`)
+        } else {
+          config.headers!.Authorization = `Bearer ${newToken}`
+        }
+
+        processQueue(null, newToken)
         return api(config)
       } catch (refreshError) {
+        processQueue(refreshError, null)
         limparSessao()
-        if (router.currentRoute.value.path !== '/login') {
-          router.push('/login')
-        }
+        if (router.currentRoute.value.path !== '/login') router.push('/login')
         return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
       }
     }
 
-    // Lógica de Timeout / Network error original mantida...
     const isTimeout =
       error.code === 'ECONNABORTED' || error.message?.includes('timeout')
     const isNetworkError = !error.response && error.code !== 'ERR_CANCELED'

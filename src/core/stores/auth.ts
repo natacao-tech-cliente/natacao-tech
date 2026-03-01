@@ -12,11 +12,22 @@ function sanitizarRole(role: string | null): RoleValida | null {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<string | null>(null)
-  const role = ref<RoleValida | null>(null)
-  const loading = ref(false)
   const router = useRouter()
 
+  // Persistência visual (LocalStorage)
+  const user = ref<string | null>(localStorage.getItem('user'))
+  const role = ref<RoleValida | null>(
+    sanitizarRole(localStorage.getItem('role'))
+  )
+
+  // PROTEÇÃO XSS: Token mantido apenas em memória (ou injetado no Axios)
+  const token = ref<string | null>(null)
+  const loading = ref(false)
+
+  // Computeds Originais de Permissão
+  const isAuthenticated = computed(
+    () => !!user.value && !!role.value && !!token.value
+  )
   const userRole = computed(() => role.value)
   const isAdmin = computed(() => role.value === 'ADMIN')
   const isDiretor = computed(
@@ -62,46 +73,45 @@ export const useAuthStore = defineStore('auth', () => {
         }
       }
 
-      // CORREÇÃO: Salva explicitamente o JWT extraído
-      localStorage.setItem('token', tokenData)
       localStorage.setItem('user', userLogin)
       localStorage.setItem('role', roleValidado)
 
       user.value = userLogin
       role.value = roleValidado
+      token.value = tokenData
+
+      api.defaults.headers.common['Authorization'] = `Bearer ${tokenData}`
 
       return { success: true }
     } catch (error: any) {
       const status = error.response?.status
-      let msg = 'Não foi possível conectar ao servidor. Tente novamente.'
-      if (status === 401 || status === 403) {
-        msg =
-          'E-mail ou senha incorretos. Verifique seus dados e tente novamente.'
-      } else if (status === 429) {
-        msg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
-      }
+      let msg = 'Erro ao conectar. Tente novamente.'
+      if (status === 401 || status === 403) msg = 'Credenciais incorretas.'
+      else if (status === 429) msg = 'Muitas tentativas. Aguarde.'
       return { success: false, error: msg }
     } finally {
       loading.value = false
     }
   }
 
-  async function signOut() {
-    try {
-      await api.post('/auth/logout')
-    } catch (e) {
-      console.error('Erro ao fazer logout no servidor', e)
-    }
-    _limparSessao()
-    router.push('/login')
-  }
-
   function _limparSessao() {
-    localStorage.removeItem('token')
     localStorage.removeItem('user')
     localStorage.removeItem('role')
     user.value = null
     role.value = null
+    token.value = null
+    delete api.defaults.headers.common['Authorization']
+  }
+
+  async function signOut() {
+    try {
+      await api.post('/auth/logout')
+    } catch (error) {
+      console.error('Erro no logout', error)
+    } finally {
+      _limparSessao()
+      router.push('/login')
+    }
   }
 
   async function alterarSenha(payload: any) {
@@ -134,7 +144,9 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     role,
+    token,
     loading,
+    isAuthenticated,
     userRole,
     isAdmin,
     isDiretor,
