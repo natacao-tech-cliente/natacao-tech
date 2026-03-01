@@ -91,7 +91,9 @@ onMounted(async () => {
           class="block text-slate-500 text-sm font-bold uppercase tracking-wider mb-1"
           >Professores</span
         >
-        <span class="block text-4xl font-black text-slate-800">{{ 0 }}</span>
+        <span class="block text-4xl font-black text-slate-800">{{
+          store.stats.totalProfessores || 0
+        }}</span>
       </div>
     </div>
 

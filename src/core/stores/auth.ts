@@ -2,35 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/core/services/api'
-
-interface JwtPayload {
-  sub?: string
-  role?: string
-  exp?: number
-  iat?: number
-}
-
-const ROLES_VALIDAS = ['ADMIN', 'DIRETOR', 'COORDENADOR', 'PROFESSOR'] as const
-type RoleValida = (typeof ROLES_VALIDAS)[number]
-
-function decodeJwtPayload(token: string): JwtPayload | null {
-  try {
-    const [, payload] = token.split('.')
-    if (!payload) return null
-    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
-    return JSON.parse(json) as JwtPayload
-  } catch {
-    return null
-  }
-}
-
-function isTokenExpired(token: string): boolean {
-  const payload = decodeJwtPayload(token)
-  if (!payload?.exp) return false
-  const nowSeconds = Math.floor(Date.now() / 1000)
-  const CLOCK_SKEW_SECONDS = 60
-  return payload.exp < nowSeconds - CLOCK_SKEW_SECONDS
-}
+import { ROLES_VALIDAS, type RoleValida } from '@/core/types/roles'
 
 function sanitizarRole(role: string | null): RoleValida | null {
   if (!role) return null
@@ -40,7 +12,6 @@ function sanitizarRole(role: string | null): RoleValida | null {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(null)
   const user = ref<string | null>(null)
   const role = ref<RoleValida | null>(null)
   const loading = ref(false)
@@ -59,16 +30,14 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   function checkAuth() {
-    const storedToken = localStorage.getItem('token')
     const storedRole = localStorage.getItem('role')
     const storedUser = localStorage.getItem('user')
 
-    if (!storedToken || isTokenExpired(storedToken)) {
+    if (!storedUser || !storedRole) {
       _limparSessao()
       return
     }
 
-    token.value = storedToken
     user.value = storedUser
     role.value = sanitizarRole(storedRole)
   }
@@ -81,21 +50,25 @@ export const useAuthStore = defineStore('auth', () => {
         password: pass,
       })
 
-      const tokenRecebido: string = response.data.token
-      if (!tokenRecebido) {
-        return { success: false, error: 'Resposta inválida do servidor.' }
+      const userLogin = response.data.login
+      const userRoleData = response.data.role
+      const tokenData = response.data.token
+      const roleValidado = sanitizarRole(userRoleData)
+
+      if (!roleValidado || !tokenData) {
+        return {
+          success: false,
+          error: 'Acesso negado: Perfil ou token inválido.',
+        }
       }
 
-      const payload = decodeJwtPayload(tokenRecebido)
-      const roleDoToken = sanitizarRole(payload?.role ?? null)
+      // CORREÇÃO: Salva explicitamente o JWT extraído
+      localStorage.setItem('token', tokenData)
+      localStorage.setItem('user', userLogin)
+      localStorage.setItem('role', roleValidado)
 
-      localStorage.setItem('token', tokenRecebido)
-      localStorage.setItem('user', email)
-      if (roleDoToken) localStorage.setItem('role', roleDoToken)
-
-      token.value = tokenRecebido
-      user.value = email
-      role.value = roleDoToken
+      user.value = userLogin
+      role.value = roleValidado
 
       return { success: true }
     } catch (error: any) {
@@ -113,7 +86,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function signOut() {
+  async function signOut() {
+    try {
+      await api.post('/auth/logout')
+    } catch (e) {
+      console.error('Erro ao fazer logout no servidor', e)
+    }
     _limparSessao()
     router.push('/login')
   }
@@ -122,7 +100,6 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     localStorage.removeItem('role')
-    token.value = null
     user.value = null
     role.value = null
   }
@@ -156,7 +133,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user,
-    token,
     role,
     loading,
     userRole,

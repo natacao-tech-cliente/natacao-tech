@@ -58,11 +58,9 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex flex-wrap gap-1.5">
-                  <template
-                    v-if="student.turmas && student.turmas !== 'Sem Turma'"
-                  >
+                  <template v-if="student.turmas && student.turmas.length > 0">
                     <span
-                      v-for="turma in student.turmas.split(', ')"
+                      v-for="turma in student.turmas"
                       :key="turma"
                       class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium"
                     >
@@ -356,10 +354,10 @@ async function abrirHistorico(uuid: string) {
 function openModal(student?: any) {
   if (student) {
     editingId.value = student.id
+
     const selectedClassIds =
-      student.turmas && student.turmas !== 'Sem Turma'
+      student.turmas && student.turmas.length > 0
         ? (student.turmas
-            .split(', ')
             .map((nome: string) => {
               const cls = classesStore.classes.find((c) => c.nome === nome)
               return cls ? cls.uuid : null

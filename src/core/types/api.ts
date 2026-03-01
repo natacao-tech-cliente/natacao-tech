@@ -54,6 +54,7 @@ export interface AlunoDTO {
 export interface DashboardDTO {
   totalTurmas: number
   totalAlunos: number
+  totalProfessores: number
   turmasDeHoje: TurmaDTO[]
   todasMinhasTurmas: TurmaDTO[]
 }

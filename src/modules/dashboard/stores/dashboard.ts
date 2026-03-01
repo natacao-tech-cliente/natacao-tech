@@ -7,6 +7,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const stats = ref<DashboardDTO>({
     totalTurmas: 0,
     totalAlunos: 0,
+    totalProfessores: 0,
     turmasDeHoje: [],
     todasMinhasTurmas: [],
   })

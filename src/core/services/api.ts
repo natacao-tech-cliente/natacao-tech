@@ -1,4 +1,5 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios'
+import router from '@/router'
 
 interface RetryConfig extends InternalAxiosRequestConfig {
   _retryCount?: number
@@ -16,13 +17,14 @@ function limparSessao() {
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '',
   timeout: 40_000,
+  withCredentials: false,
   headers: { 'Content-Type': 'application/json' },
 })
 
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
-    if (token) {
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
@@ -36,14 +38,37 @@ api.interceptors.response.use(
     const config = error.config as RetryConfig
     const status = error.response?.status
 
-    if (status === 401) {
-      limparSessao()
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login'
+    if (
+      status === 401 &&
+      !config.url?.includes('/auth/login') &&
+      !config.url?.includes('/auth/refresh')
+    ) {
+      try {
+        const refreshResponse = await axios.post(
+          `${api.defaults.baseURL}/auth/refresh`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        )
+
+        const newToken = refreshResponse.data.token
+        localStorage.setItem('token', newToken)
+
+        config.headers!.Authorization = `Bearer ${newToken}`
+        return api(config)
+      } catch (refreshError) {
+        limparSessao()
+        if (router.currentRoute.value.path !== '/login') {
+          router.push('/login')
+        }
+        return Promise.reject(refreshError)
       }
-      return Promise.reject(error)
     }
 
+    // Lógica de Timeout / Network error original mantida...
     const isTimeout =
       error.code === 'ECONNABORTED' || error.message?.includes('timeout')
     const isNetworkError = !error.response && error.code !== 'ERR_CANCELED'

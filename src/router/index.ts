@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/core/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import type { RoleValida } from '@/core/types/roles'
 
 const LandingView = () => import('@/modules/public/views/LandingView.vue')
 const LoginView = () => import('@/modules/auth/views/LoginView.vue')
@@ -19,7 +20,7 @@ declare module 'vue-router' {
   interface RouteMeta {
     public?: boolean
     requiresAuth?: boolean
-    allowedRoles?: Array<'ADMIN' | 'DIRETOR' | 'COORDENADOR' | 'PROFESSOR'>
+    allowedRoles?: Array<RoleValida>
   }
 }
 
@@ -118,12 +119,11 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   const auth = useAuthStore()
 
-  if (!auth.token) {
+  if (!auth.user) {
     auth.checkAuth()
   }
 
-  const isAuthenticated = !!auth.token
-  const isPublic = to.meta.public === true
+  const isAuthenticated = !!auth.user
   const requiresAuth = to.matched.some((r) => r.meta.requiresAuth)
   const allowedRoles = to.meta.allowedRoles
 
@@ -139,7 +139,10 @@ router.beforeEach((to, _from, next) => {
     return next('/')
   }
 
-  if (allowedRoles && auth.role && !allowedRoles.includes(auth.role as any)) {
+  if (
+    allowedRoles &&
+    (!auth.role || !allowedRoles.includes(auth.role as any))
+  ) {
     return next('/')
   }
 
