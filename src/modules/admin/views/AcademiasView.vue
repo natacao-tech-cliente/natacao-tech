@@ -192,7 +192,10 @@ async function salvarAcad() {
     toast.add({
       severity: 'error',
       summary: 'Erro ao salvar',
-      detail: e.response?.data?.message || 'Verifique os dados.',
+      detail:
+        e.response?.data?.mensagem ||
+        e.response?.data?.message ||
+        'Verifique os dados.',
     })
   } finally {
     submittingAcad.value = false
