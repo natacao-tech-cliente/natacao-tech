@@ -16,7 +16,6 @@ function isTokenValid(token: string | null): boolean {
   try {
     const parts = token.split('.')
     if (parts.length !== 3 || !parts[1]) return false
-
     const payload = JSON.parse(atob(parts[1]))
     return payload.exp * 1000 > Date.now()
   } catch (e) {
@@ -31,8 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
   const role = ref<RoleValida | null>(
     sanitizarRole(localStorage.getItem('role'))
   )
-
-  const token = ref<string | null>(sessionStorage.getItem('token'))
+  const token = ref<string | null>(localStorage.getItem('token'))
   const loading = ref(false)
 
   const isAuthenticated = computed(
@@ -51,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   function checkAuth() {
-    const storedToken = sessionStorage.getItem('token')
+    const storedToken = localStorage.getItem('token')
     if (!storedToken || !isTokenValid(storedToken)) {
       _limparSessao()
       return
@@ -83,8 +81,8 @@ export const useAuthStore = defineStore('auth', () => {
 
       localStorage.setItem('user', userLogin)
       localStorage.setItem('role', roleValidado)
-      sessionStorage.setItem('token', accessToken)
-      sessionStorage.setItem('refreshToken', refreshToken)
+      localStorage.setItem('token', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
 
       user.value = userLogin
       role.value = roleValidado
@@ -107,8 +105,8 @@ export const useAuthStore = defineStore('auth', () => {
   function _limparSessao() {
     localStorage.removeItem('user')
     localStorage.removeItem('role')
-    sessionStorage.removeItem('token')
-    sessionStorage.removeItem('refreshToken')
+    localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
     user.value = null
     role.value = null
     token.value = null
@@ -117,7 +115,8 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function signOut() {
     try {
-      await api.post('/auth/logout')
+      const rToken = localStorage.getItem('refreshToken')
+      await api.post('/auth/logout', { refreshToken: rToken })
     } catch (error) {
       console.error('Erro no logout', error)
     } finally {
@@ -133,7 +132,6 @@ export const useAuthStore = defineStore('auth', () => {
       throw error
     }
   }
-
   async function promoverDiretor(uuid: string) {
     try {
       await api.patch(`/api/usuarios/${uuid}/promover-diretor`)
@@ -141,7 +139,6 @@ export const useAuthStore = defineStore('auth', () => {
       throw error
     }
   }
-
   async function rebaixarUsuario(uuid: string) {
     try {
       await api.patch(`/api/usuarios/${uuid}/rebaixar-usuario`)

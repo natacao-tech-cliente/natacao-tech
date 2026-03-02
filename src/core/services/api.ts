@@ -22,8 +22,8 @@ const processQueue = (error: any, token: string | null = null) => {
 function limparSessao() {
   localStorage.removeItem('user')
   localStorage.removeItem('role')
-  sessionStorage.removeItem('token')
-  sessionStorage.removeItem('refreshToken')
+  localStorage.removeItem('token')
+  localStorage.removeItem('refreshToken')
   delete api.defaults.headers.common['Authorization']
 }
 
@@ -70,7 +70,7 @@ api.interceptors.response.use(
           .catch((err) => Promise.reject(err))
       }
 
-      const currentRefreshToken = sessionStorage.getItem('refreshToken')
+      const currentRefreshToken = localStorage.getItem('refreshToken')
 
       if (!currentRefreshToken) {
         limparSessao()
@@ -90,8 +90,8 @@ api.interceptors.response.use(
         const newToken = refreshResponse.data.token
         const newRefreshToken = refreshResponse.data.refreshToken
 
-        sessionStorage.setItem('token', newToken)
-        sessionStorage.setItem('refreshToken', newRefreshToken)
+        localStorage.setItem('token', newToken)
+        localStorage.setItem('refreshToken', newRefreshToken)
 
         api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 
