@@ -484,8 +484,7 @@ async function confirmarPromoverDiretor() {
   try {
     await api.patch(
       `/api/usuarios/${profParaPromover.value.uuid}/promover-diretor`,
-      null,
-      { params: { academiaId: academiaIdParaDiretor.value } }
+      { academiaId: academiaIdParaDiretor.value }
     )
     toast.add({
       severity: 'success',
