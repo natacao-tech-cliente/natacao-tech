@@ -181,24 +181,6 @@ async function handleLogin() {
           <label for="password" class="text-slate-500 ml-1">Sua Senha</label>
         </FloatLabel>
 
-        <div class="flex items-center justify-between text-sm px-1">
-          <div class="flex items-center gap-2.5 cursor-pointer group">
-            <input
-              type="checkbox"
-              id="remember"
-              class="w-4 h-4 rounded border-slate-300 text-sky-500 focus:ring-sky-500 transition-all cursor-pointer"
-            />
-            <label
-              for="remember"
-              class="text-slate-500 group-hover:text-slate-700 transition-colors cursor-pointer"
-              >Lembrar-me</label
-            >
-          </div>
-          <a href="#" class="text-sky-600 hover:text-sky-700 transition-colors">
-            Esqueceu a senha?
-          </a>
-        </div>
-
         <Button
           type="submit"
           :label="botaoLabel"

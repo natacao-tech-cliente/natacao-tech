@@ -118,6 +118,15 @@ const router = createRouter({
             allowedRoles: ['ADMIN', 'DIRETOR'],
           },
         },
+        {
+          path: 'admin/integracao',
+          name: 'admin-integracao',
+          component: () => import('@/modules/admin/views/IntegracaoView.vue'),
+          meta: {
+            requiresAuth: true,
+            allowedRoles: ['ADMIN'],
+          },
+        },
       ],
     },
 

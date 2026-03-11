@@ -281,6 +281,36 @@ function isActive(path: string) {
             />
             <span class="text-[13px] tracking-wide">Habilidades</span>
           </a>
+
+          <a
+            @click="navigate('/admin/integracao')"
+            class="flex items-center gap-3.5 px-4 py-3.5 mx-4 rounded-2xl cursor-pointer transition-all duration-300 font-semibold group relative overflow-hidden"
+            :class="
+              isActive('/admin/integracao')
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_8px_16px_-4px_rgba(14,165,233,0.4)]'
+                : 'text-slate-500 hover:bg-sky-50/50 hover:text-sky-700'
+            "
+          >
+            <i
+              :class="[
+                'pi pi-sync text-[1.1rem] transition-transform group-hover:scale-110 duration-300',
+                isActive('/admin/integracao')
+                  ? 'text-white drop-shadow-md'
+                  : 'text-slate-400 group-hover:text-sky-500',
+              ]"
+            />
+            <span class="text-[13px] tracking-wide">Importar EVO</span>
+            <span
+              class="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full border transition-colors"
+              :class="
+                isActive('/admin/integracao')
+                  ? 'bg-white/20 text-white border-white/30'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+              "
+            >
+              EVO
+            </span>
+          </a>
         </template>
       </template>
     </div>
